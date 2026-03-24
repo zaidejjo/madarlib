@@ -7,8 +7,8 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #011036;
+    color: #ffff;
     padding: 20px;
 }
 
@@ -19,7 +19,7 @@ header {
 
 header h1 {
     font-size: 2.5rem;
-    color: #4a4e69;
+    color: #ffff;
 }
 
 .books-container {
@@ -65,7 +65,7 @@ header h1 {
 .download-btn {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #4a4e69;
+    background-color: #1a316b;
     color: #fff;
     text-decoration: none;
     border-radius: 8px;
@@ -86,4 +86,29 @@ header h1 {
     flex-direction: column;
     align-items: center; /* يحرك كل شيء في المنتصف */
     gap: 10px;
+}
+
+
+.room__topLeft {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #1a316b;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background-color 0.2s;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.room__topLeft:hover {
+    background-color: #22223b;
+    transform: scale(1.1);
+}
+
+.room__topLeft svg {
+    fill: #fff; /* لون السهم */
+    width: 32px;
+    height: 32px;
 }
