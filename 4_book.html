@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<!--
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║                📚  UNIVERSAL GRADE BOOK TEMPLATE                          ║
+║                                                                           ║
+║  HOW TO USE:                                                              ║
+║                                                                           ║
+║  1. Duplicate this file and rename it, e.g.:                              ║
+║       cp book_template.html 8_book.html                                   ║
+║       cp book_template.html 9_book.html                                   ║
+║       cp book_template.html 10_book.html                                  ║
+║       cp book_template.html 11_book.html                                  ║
+║                                                                           ║
+║  2. Edit ONLY the CONFIGURATION section below (marked with arrows):       ║
+║       → Change `number: 9` to your grade number                           ║
+║       → Change `nameArabic: 'الرابع'` to the Arabic grade name            ║
+║       → Update the `books` array with your subjects and semesters        ║
+║                                                                           ║
+║  3. The rest auto-generates — filters, cards, paths.                      ║
+║                                                                           ║
+║  FILE PATH PATTERN:                                                       ║
+║    books/grades/{grade}/{grade}_{subjectCode}_{semester}.pdf              ║
+║    Example: books/grades/9/9_ar_1.pdf, books/grades/10/10_math_2.pdf      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020617" id="metaTheme">
+  <meta name="description" content="" id="metaDesc">
+  <title id="pageTitle">مكتبة مدار</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- ============================================================
+          🎯  CONFIGURATION — EDIT THIS FOR EACH GRADE
+          ============================================================ -->
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    //  >>>  EDIT THESE VALUES for each grade  <<<
+    // ═══════════════════════════════════════════════════════════════
+
+    var GRADE_CONFIG = {
+      // ── Grade identification ──
+      number: 4,                      // << CHANGE: 8, 9, 10, or 11
+      nameArabic: 'الرابع',            // << CHANGE: 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر'
+      nameEnglish: 'Grade 4',         // << CHANGE: 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11'
+
+      // ── Page URL (the file name without .html) ──
+      //    This is used for the breadcrumb "back to grades" link.
+      //    Must match the filename you create, e.g. "9_book"
+      slug: '4_book',                  // << CHANGE: '8_book', '9_book', '10_book', '11_book'
+
+      // ── Hero gradient accent (Tailwind color name) ──
+      accentColor: 'pink',            // << CHOOSE: 'cyan'(gr8), 'blue'(gr9), 'emerald'(gr10), 'violet'(gr11)
+
+      // ── Books list ──
+      //    Add/remove subjects as needed. Each entry:
+      //      subject   : Arabic display name
+      //      code      : short code used in filename (e.g. "ar" → books/grades/9/9_ar_1.pdf)
+      //      icon      : FontAwesome icon class (without "fa-solid ")
+      //      gradient  : Tailwind gradient classes for the cover placeholder
+      //      semesters : array of { term: 1 or 2, label: 'الفصل الأول' or 'الفصل الثاني' }
+      //      badgeColor: Tailwind color name for the semester badge
+      books: [
+        {
+          subject: 'اللغة العربية',
+          code: 'ar',
+          icon: 'fa-book-quran',
+          gradient: 'from-emerald-600/40 via-emerald-800/30 to-slate-900',
+          badgeColors: ['emerald', 'amber'],
+          semesters: [
+            { term: 1, label: 'الفصل الأول' },
+            { term: 2, label: 'الفصل الثاني' }
+          ]
+        },
+        {
+          subject: 'الرياضيات',
+          code: 'math',
+          icon: 'fa-square-root-variable',
+          gradient: 'from-blue-600/40 via-blue-800/30 to-slate-900',
+          badgeColors: ['emerald', 'amber'],
+          semesters: [
+            { term: 1, label: 'الفصل الأول' },
+            { term: 2, label: 'الفصل الثاني' }
+          ]
+        },
+        {
+          subject: 'اللغة الانجليزية',
+          code: 'en',
+          icon: 'fa-language',
+          gradient: 'from-amber-600/40 via-amber-800/30 to-slate-900',
+          badgeColors: ['emerald', 'amber'],
+          semesters: [
+            { term: 1, label: 'الفصل الأول' },
+            { term: 2, label: 'الفصل الثاني' }
+          ]
+        },
+        {
+          subject: 'الكيمياء',
+          code: 'ch',
+          icon: 'fa-flask',
+          gradient: 'from-purple-600/40 via-purple-800/30 to-slate-900',
+          badgeColors: ['emerald', 'amber'],
+          semesters: [
+            { term: 1, label: 'الفصل الأول' },
+            { term: 2, label: 'الفصل الثاني' }
+          ]
+        },
+        {
+          subject: 'الفيزياء',
+          code: 'ph',
+          icon: 'fa-atom',
+          gradient: 'from-cyan-600/40 via-cyan-800/30 to-slate-900',
+          badgeColors: ['emerald', 'amber'],
+          semesters: [
+            { term: 1, label: 'الفصل الأول' },
+            { term: 2, label: 'الفصل الثاني' }
+          ]
+        }
+        // ── To add more subjects, just add more objects above ──
+      ]
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    //  >>>  END OF CONFIGURATION — do not edit below  <<<
+    // ═══════════════════════════════════════════════════════════════
+  </script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       TAILWIND CONFIG (extends theme)
+       ══════════════════════════════════════════════════════════════ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: {
+            'xs': '420px',
+          },
+          fontFamily: {
+            sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 7s ease-in-out infinite',
+            'float-delayed': 'float 7s ease-in-out 3.5s infinite',
+            'slide-up': 'slide-up 0.6s ease-out forwards',
+            'shimmer': 'shimmer 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-24px)' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       GLOBAL RESET & BASE
+       ══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #020617;
+      background-image:
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 55%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    /* Grid overlay — prevents horizontal overflow */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       GLASSMORPHISM
+       ══════════════════════════════════════════════════════════════ */
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .glass-strong {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       BOOK CARD
+       ══════════════════════════════════════════════════════════════ */
+    .book-card {
+      opacity: 1;
+      transition:
+        opacity 0.35s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
+    }
+
+    .book-card.hidden-card {
+      display: none;
+    }
+
+    .book-card:active {
+      transform: scale(0.98);
+    }
+
+    @media (hover: hover) {
+      .book-card:hover {
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Cover image placeholder — subtle inner shadow */
+    .book-cover {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to top, rgba(0,0,0,0.45), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       FILTER PILLS
+       ══════════════════════════════════════════════════════════════ */
+    .filter-pill {
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .filter-pill.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.5);
+      color: #22d3ee;
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
+    }
+
+    /* Scrollable filter container — hides scrollbar on mobile */
+    .filter-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+
+    /* ══════════════════════════════════════════════════════════════
+       GRADIENT TEXT
+       ══════════════════════════════════════════════════════════════ */
+    .gradient-text {
+      background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-text-accent {
+      background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DOWNLOAD BUTTON SHIMMER
+       ══════════════════════════════════════════════════════════════ */
+    .btn-download {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 44px; /* iOS tap target */
+    }
+
+    .btn-download::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.04) 60%,
+        transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       ENTRANCE STAGGER (up to 12 items)
+       ══════════════════════════════════════════════════════════════ */
+    .entrance-1  { animation: slide-up 0.5s ease-out 0.02s both; }
+    .entrance-2  { animation: slide-up 0.5s ease-out 0.05s both; }
+    .entrance-3  { animation: slide-up 0.5s ease-out 0.08s both; }
+    .entrance-4  { animation: slide-up 0.5s ease-out 0.11s both; }
+    .entrance-5  { animation: slide-up 0.5s ease-out 0.14s both; }
+    .entrance-6  { animation: slide-up 0.5s ease-out 0.17s both; }
+    .entrance-7  { animation: slide-up 0.5s ease-out 0.20s both; }
+    .entrance-8  { animation: slide-up 0.5s ease-out 0.23s both; }
+    .entrance-9  { animation: slide-up 0.5s ease-out 0.26s both; }
+    .entrance-10 { animation: slide-up 0.5s ease-out 0.29s both; }
+    .entrance-11 { animation: slide-up 0.5s ease-out 0.32s both; }
+    .entrance-12 { animation: slide-up 0.5s ease-out 0.35s both; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCROLLBAR
+       ══════════════════════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #22d3ee, #6366f1);
+      border-radius: 3px;
+    }
+    html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+
+    /* Selection */
+    ::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+
+    /* Nav safe area */
+    .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+    /* Prevent FOUC — hide filter bar and grid until JS loads */
+    .js-hidden { visibility: hidden; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       DECORATIVE ORBS (z-0)
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-blue-500/8 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute -bottom-40 -right-40 w-80 sm:w-[30rem] h-80 sm:h-[30rem] bg-indigo-500/8 rounded-full blur-[120px] animate-float-delayed"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       NAVBAR
+       ══════════════════════════════════════════════════════════════ -->
+  <nav class="relative z-50 nav-safe">
+    <div class="glass-strong fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] sm:w-[calc(100%-2rem)] max-w-6xl rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl shadow-cyan-500/5">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
+          <i class="fa-solid fa-book-open text-white text-sm sm:text-lg"></i>
+        </div>
+        <span class="text-white font-bold text-base sm:text-xl tracking-tight">مكتبة <span class="gradient-text">مدار</span></span>
+      </a>
+
+      <!-- Desktop nav links -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">
+          <i class="fa-solid fa-house ml-1.5"></i>الرئيسية
+        </a>
+        <span id="navGradeLabel" class="text-cyan-300 text-sm font-medium">
+          <i class="fa-solid fa-book ml-1.5"></i><span id="navGradeText"></span>
+        </span>
+      </div>
+
+      <!-- Desktop back button -->
+      <a href="index.html"
+         class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
+                text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
+                hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
+                transition-all duration-300 shrink-0">
+        <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+        العودة للصفوف
+      </a>
+
+      <!-- Mobile hamburger -->
+      <button id="mobileMenuBtn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PAGE HEADER
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="relative z-10 pt-28 pb-6 sm:pt-36 sm:pb-8 md:pt-44 md:pb-10 px-4">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- Breadcrumb — hidden on smallest screens (tap-friendly) -->
+      <div class="hidden xs:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 entrance-1">
+        <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs text-slate-700"></i>
+        <span id="breadcrumbGrade" class="text-cyan-400"></span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+
+        <!-- Left: title -->
+        <div class="entrance-2">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span id="headerBadge"></span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            كتب <span id="headerTitle" class="gradient-text-accent"></span>
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base mt-1.5 sm:mt-2">اختر المادة الدراسية ثم حمل الكتاب بنقرة واحدة</p>
+        </div>
+
+        <!-- Right: mobile back button -->
+        <a href="index.html"
+           class="sm:hidden inline-flex items-center justify-center gap-2 w-full xs:w-auto px-5 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-700/60 active:scale-[0.98] transition-all duration-200 entrance-3 min-h-[44px]">
+          <i class="fa-solid fa-arrow-right"></i>
+          العودة للصفوف
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FILTER BAR — Mobile: horizontal scroll | Desktop: wrap
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="relative z-10 px-4 pb-4 sm:pb-6 js-hidden" id="filterSection">
+    <div class="max-w-6xl mx-auto">
+
+      <!--
+        MOBILE: `.overflow-x-auto` + `.flex-nowrap` = horizontal scroll
+        The scroll container has no visible scrollbar.
+        DESKTOP (md:): switches to `.flex-wrap` so pills wrap naturally.
+      -->
+      <div class="overflow-x-auto md:overflow-visible filter-scroll -mx-4 px-4 md:mx-0 md:px-0">
+        <div class="glass rounded-xl sm:rounded-2xl p-1.5 sm:p-2 inline-flex flex-nowrap md:flex-wrap items-center gap-1.5 sm:gap-2 min-w-max md:min-w-0" id="filterContainer">
+          <!-- Filters injected by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       BOOKS GRID — Injected by JavaScript
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24 js-hidden" id="booksSection">
+    <div class="max-w-6xl mx-auto">
+
+      <!--
+        RESPONSIVE GRID:
+          - 1 column  on mobile  (< 640px)
+          - 2 columns on tablet   (≥ 640px)
+          - 3 columns on desktop  (≥ 1024px)
+          - 4 columns on wide     (≥ 1280px)
+      -->
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+        <!-- Cards rendered by JavaScript -->
+      </div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="hidden text-center py-16 sm:py-20">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center mx-auto mb-5 sm:mb-6">
+          <i class="fa-solid fa-book-open text-slate-600 text-2xl sm:text-3xl"></i>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-300 mb-1.5 sm:mb-2">لا توجد كتب في هذا التصنيف</h3>
+        <p class="text-slate-500 text-sm">اختر تصنيفاً آخر لعرض الكتب المتاحة</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════════════════════ -->
+  <footer class="relative z-10 border-t border-slate-800/60">
+    <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-2 text-slate-400 text-xs sm:text-sm">
+          <i class="fa-regular fa-copyright text-[10px] sm:text-sm"></i>
+          <span>جميع الحقوق محفوظة لمكتبة <span class="text-cyan-400 font-semibold">مدار</span> 2024</span>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500">
+          <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+          <span class="text-slate-700">|</span>
+          <span id="footerGrade" class="text-cyan-400"></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MOBILE MENU OVERLAY
+       ══════════════════════════════════════════════════════════════ -->
+  <div id="mobileMenu" class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl hidden">
+    <div class="flex flex-col items-center justify-center h-full gap-8 px-6">
+      <button id="closeMobileMenu" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+
+      <a href="index.html" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</a>
+      <span id="mobileGradeLabel" class="text-2xl sm:text-3xl text-cyan-400 font-semibold"></span>
+
+      <!-- Mobile quick filters in menu -->
+      <div class="flex flex-wrap justify-center gap-2.5 mt-2 px-4" id="mobileFilterList">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="mt-2 h-px w-32 bg-slate-800"></div>
+
+      <a href="https://madarcore.onrender.com"
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+        <i class="fa-solid fa-arrow-right"></i>
+        الرجوع للموقع
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       JAVASCRIPT — Engine
+       ══════════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ─── Verify config exists ─── */
+      if (typeof GRADE_CONFIG === 'undefined') {
+        document.body.innerHTML =
+          '<div style="color:red;padding:2rem;text-align:center;font-size:1.5rem;">' +
+          '⚠️ GRADES_CONFIG is missing. Edit the configuration section at the top of this file.</div>';
+        return;
+      }
+
+      var cfg = GRADE_CONFIG;
+      var gradeNum = cfg.number;
+      var gradeAr  = cfg.nameArabic;
+      var gradeEn  = cfg.nameEnglish;
+      var gradeSlug = cfg.slug;
+      var accent   = cfg.accentColor || 'blue';
+      var books    = cfg.books;
+
+      /* ─── Map accent to Tailwind text color ─── */
+      var accentMap = {
+        cyan:    'text-cyan-400',
+        blue:    'text-blue-400',
+        emerald: 'text-emerald-400',
+        violet:  'text-violet-400'
+      };
+      var accentText = accentMap[accent] || 'text-blue-400';
+
+      /* ─── Semester label and badge color mapping ─── */
+      var semesterColors = {
+        1: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', shadow: 'shadow-emerald-500/5' },
+        2: { bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   text: 'text-amber-300',   shadow: 'shadow-amber-500/5' }
+      };
+
+      /* ─── Unique subject key (for data-subject attribute) ─── */
+      var subjects = [];
+      var subjectMap = {};
+      books.forEach(function(b) {
+        var key = b.code;
+        if (!subjectMap[key]) {
+          subjectMap[key] = {
+            key: key,
+            label: b.subject,
+            icon: b.icon,
+            gradient: b.gradient
+          };
+          subjects.push(subjectMap[key]);
+        }
+      });
+
+      /* =============================================================
+         RENDER: Filter Pills
+         ============================================================= */
+      var filterContainer = document.getElementById('filterContainer');
+      if (filterContainer) {
+        var filterHTML = '';
+
+        // "All" pill
+        filterHTML +=
+          '<button class="filter-pill active px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium ' +
+          'bg-cyan-500/15 border border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5" ' +
+          'data-filter="all" onclick="window.filterBooks(\'all\')" type="button">' +
+          '<i class="fa-solid fa-layer-group ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i>' +
+          'الكل' +
+          '</button>';
+
+        // Subject pills
+        subjects.forEach(function(s, idx) {
+          var accentPill = '';
+          if (s.key === 'ar') accentPill = 'hover:text-emerald-300 hover:border-emerald-500/30 hover:bg-emerald-500/5';
+          else if (s.key === 'math') accentPill = 'hover:text-blue-300 hover:border-blue-500/30 hover:bg-blue-500/5';
+          else if (s.key === 'en') accentPill = 'hover:text-amber-300 hover:border-amber-500/30 hover:bg-amber-500/5';
+          else if (s.key === 'ch') accentPill = 'hover:text-purple-300 hover:border-purple-500/30 hover:bg-purple-500/5';
+          else if (s.key === 'ph') accentPill = 'hover:text-cyan-300 hover:border-cyan-500/30 hover:bg-cyan-500/5';
+          else accentPill = 'hover:text-slate-300 hover:border-slate-600 hover:bg-slate-800/50';
+
+          filterHTML +=
+            '<button class="filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium ' +
+            'border border-slate-700 text-slate-400 ' + accentPill + ' ' +
+            '" data-filter="' + s.key + '" onclick="window.filterBooks(\'' + s.key + '\')" type="button">' +
+            '<i class="fa-solid ' + s.icon + ' ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i>' +
+            s.label +
+            '</button>';
+        });
+
+        filterContainer.innerHTML = filterHTML;
+      }
+
+      /* =============================================================
+         RENDER: Book Cards
+         ============================================================= */
+      var booksGrid = document.getElementById('booksGrid');
+      var bookCount = 0;
+
+      if (booksGrid) {
+        var cardsHTML = '';
+        var idx = 0;
+        books.forEach(function(b) {
+          b.semesters.forEach(function(sem) {
+            idx++;
+            bookCount++;
+            var sc = semesterColors[sem.term] || semesterColors[1];
+            var path = 'books/grades/' + gradeNum + '/' + gradeNum + '_' + b.code + '_' + sem.term + '.pdf';
+            var entranceCls = 'entrance-' + (idx > 12 ? 12 : idx);
+
+            cardsHTML +=
+              '<div class="book-card rounded-xl sm:rounded-2xl overflow-hidden ' +
+              'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800/50 ' +
+              'shadow-lg shadow-slate-900/50 hover:shadow-xl ' +
+              'flex flex-col ' + entranceCls + '" ' +
+              'data-subject="' + b.code + '">' +
+                '<div class="book-cover h-36 sm:h-40 md:h-44 bg-gradient-to-br ' + b.gradient + ' flex items-center justify-center">' +
+                  '<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center">' +
+                    '<i class="fa-solid ' + b.icon + ' text-white/80 text-2xl sm:text-3xl"></i>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="p-4 sm:p-5 flex flex-col flex-1">' +
+                  '<div class="flex items-center justify-between mb-2 sm:mb-3">' +
+                    '<span class="text-slate-400 text-[10px] sm:text-xs font-medium">' + b.subject + '</span>' +
+                    '<span class="px-2 sm:px-2.5 py-0.5 rounded-full ' + sc.bg + ' border ' + sc.border + ' ' + sc.text + ' text-[10px] sm:text-xs font-semibold shadow-sm ' + sc.shadow + '">' +
+                      '<i class="fa-solid fa-star ml-1 text-[8px] sm:text-[10px]"></i>' +
+                      sem.label +
+                    '</span>' +
+                  '</div>' +
+                  '<h3 class="text-white font-bold text-sm sm:text-base mb-0.5 sm:mb-1">' + b.subject + '</h3>' +
+                  '<p class="text-slate-500 text-[10px] sm:text-xs mb-3 sm:mb-4">للصف ' + gradeAr + ' - ' + sem.label + '</p>' +
+                  '<div class="mt-auto">' +
+                    '<a download="' + path + '" href="' + path + '" target="_blank" ' +
+                       'class="btn-download group flex items-center justify-center gap-2 w-full px-3 sm:px-4 py-2.5 sm:py-3 ' +
+                       'rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ' +
+                       'bg-gradient-to-r from-slate-700/40 to-slate-800/30 ' +
+                       'border border-slate-600/30 text-slate-300 ' +
+                       'hover:from-' + accent + '-600/20 hover:to-' + accent + '-700/10 ' +
+                       'hover:border-' + accent + '-500/30 hover:text-' + accent + '-300 ' +
+                       'hover:shadow-lg hover:shadow-' + accent + '-500/10 ' +
+                       'active:scale-[0.98] transition-all duration-300">' +
+                      '<i class="fa-solid fa-download group-hover:-translate-y-0.5 transition-transform text-[10px] sm:text-xs"></i>' +
+                      '<span>تحميل الكتاب</span>' +
+                    '</a>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+          });
+        });
+
+        booksGrid.innerHTML = cardsHTML;
+      }
+
+      /* ─── Generate mobile filter list ─── */
+      var mobileFilterList = document.getElementById('mobileFilterList');
+      if (mobileFilterList) {
+        var mfHTML = '';
+        mfHTML += '<button class="filter-pill-mobile px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks(\'all\'); closeMobileMenuFn();">الكل</button>';
+        subjects.forEach(function(s) {
+          mfHTML += '<button class="filter-pill-mobile px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks(\'' + s.key + '\'); closeMobileMenuFn();">' +
+                    '<i class="fa-solid ' + s.icon + ' ml-1.5"></i>' + s.label +
+                    '</button>';
+        });
+        mobileFilterList.innerHTML = mfHTML;
+      }
+
+      /* ─── Populate dynamic text ─── */
+      function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val;
+      }
+      setText('pageTitle', 'كتب الصف ' + gradeAr + ' | مكتبة مدار');
+      setText('metaDesc', 'كتب الصف ' + gradeAr + ' - مكتبة مدار الرقمية');
+      setText('navGradeText', 'الصف ' + gradeAr);
+      setText('navGradeLabel', ''); // already set via inner span
+      setText('breadcrumbGrade', 'الصف ' + gradeAr);
+      setText('headerBadge', 'الصف ' + gradeAr + ' - ' + (bookCount || '0') + ' كتب متاحة');
+      setText('headerTitle', 'الصف ' + gradeAr);
+      setText('mobileGradeLabel', 'الصف ' + gradeAr);
+      setText('footerGrade', 'الصف ' + gradeAr);
+
+      // Update title attribute for nav label
+      var navLabel = document.getElementById('navGradeLabel');
+      if (navLabel) {
+        navLabel.innerHTML = '<i class="fa-solid fa-book ml-1.5"></i>' + 'الصف ' + gradeAr;
+      }
+
+      // ─── Show sections (remove hidden class) ───
+      document.getElementById('filterSection').classList.remove('js-hidden');
+      document.getElementById('booksSection').classList.remove('js-hidden');
+
+      /* =============================================================
+         FILTER FUNCTION (exposed globally)
+         ============================================================= */
+      window.filterBooks = function(subjectKey) {
+        var cards = document.querySelectorAll('.book-card[data-subject]');
+        var pills = document.querySelectorAll('.filter-pill[data-filter]');
+        var visibleCount = 0;
+
+        // Update active pill styling
+        pills.forEach(function(pill) {
+          var key = pill.getAttribute('data-filter');
+          if (key === subjectKey) {
+            // Set active
+            pill.className = pill.className
+              .replace(/(bg-\w+-\d+\/\d+)/g, '')
+              .replace(/(border-\w+-\d+\/\d+)/g, '')
+              .replace(/(text-\w+-\d+)/g, '')
+              .replace(/(shadow-\w+)/g, '')
+              .trim();
+            pill.classList.add(
+              'bg-cyan-500/15', 'border-cyan-500/50', 'text-cyan-300', 'shadow-lg', 'shadow-cyan-500/5'
+            );
+            pill.classList.add('active');
+          } else {
+            // Reset to inactive — extract hover states from original class
+            var orig = pill.className;
+            var hoverText = orig.match(/hover:text-\w+-\d+/);
+            var hoverBorder = orig.match(/hover:border-\w+-\d+\/\d+/);
+            var hoverBg = orig.match(/hover:bg-\w+-\d+\/\d+/);
+
+            pill.className =
+              'filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium ' +
+              'border border-slate-700 text-slate-400 ' +
+              (hoverText ? hoverText[0] : '') + ' ' +
+              (hoverBorder ? hoverBorder[0] : '') + ' ' +
+              (hoverBg ? hoverBg[0] : '');
+            pill.classList.remove('active');
+          }
+        });
+
+        // Show/hide cards with re-triggered entrance animation
+        cards.forEach(function(card, index) {
+          var subject = card.getAttribute('data-subject');
+          if (subjectKey === 'all' || subject === subjectKey) {
+            card.classList.remove('hidden-card');
+            // Re-trigger entrance
+            card.style.animation = 'none';
+            card.offsetHeight; // force reflow
+            var animIdx = (index % 12) + 1;
+            card.style.animation = 'slide-up 0.4s ease-out ' + (index * 0.04) + 's both';
+            visibleCount++;
+          } else {
+            card.classList.add('hidden-card');
+          }
+        });
+
+        // Toggle empty state
+        var empty = document.getElementById('emptyState');
+        if (empty) {
+          empty.classList.toggle('hidden', visibleCount > 0);
+        }
+      };
+
+      /* =============================================================
+         MOBILE MENU
+         ============================================================= */
+      var menuBtn = document.getElementById('mobileMenuBtn');
+      var mobileMenu = document.getElementById('mobileMenu');
+      var closeBtn = document.getElementById('closeMobileMenu');
+
+      if (menuBtn && mobileMenu && closeBtn) {
+        menuBtn.addEventListener('click', function() {
+          mobileMenu.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        });
+        closeBtn.addEventListener('click', closeMobileMenuFn);
+        mobileMenu.addEventListener('click', function(e) {
+          if (e.target === this) closeMobileMenuFn();
+        });
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') closeMobileMenuFn();
+        });
+      }
+
+      window.closeMobileMenuFn = function() {
+        var mm = document.getElementById('mobileMenu');
+        if (mm) {
+          mm.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
+      };
+
+    })();
+  </script>
+
+</body>
+</html>
