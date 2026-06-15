@@ -8,16 +8,15 @@
   <title>مكتبة مدار | المكتبة الرقمية</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
-    /* ══════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
        TAILWIND CONFIG
-       ══════════════════════════════════════════════════ */
+       ══════════════════════════════════════════════════════════════ */
     tailwind.config = {
       theme: {
         extend: {
-          screens: {
-            'xs': '420px',
-          },
+          screens: { 'xs': '420px' },
           fontFamily: {
             sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
           },
@@ -46,9 +45,9 @@
     };
   </script>
   <style>
-    /* ══════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
        GLOBAL RESET & BASE
-       ══════════════════════════════════════════════════ */
+       ══════════════════════════════════════════════════════════════ */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     html {
@@ -65,11 +64,10 @@
       min-height: 100dvh;
       font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
       overflow-x: hidden;
-      /* Prevent iOS zoom on input focus */
       touch-action: manipulation;
     }
 
-    /* Subtle grid overlay — prevents horizontal overflow */
+    /* Subtle grid overlay */
     body::before {
       content: '';
       position: fixed;
@@ -82,16 +80,15 @@
       z-index: 0;
     }
 
-    /* ══════════════════════════════════════════════════
-       GLASSMORPHISM UTILITIES
-       ══════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       GLASSMORPHISM
+       ══════════════════════════════════════════════════════════════ */
     .glass {
       background: rgba(15, 23, 42, 0.6);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(148, 163, 184, 0.08);
     }
-
     .glass-strong {
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(24px);
@@ -99,9 +96,9 @@
       border: 1px solid rgba(148, 163, 184, 0.1);
     }
 
-    /* ══════════════════════════════════════════════════
-       GRADE CARDS
-       ══════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       GRADE CARD (dashboard)
+       ══════════════════════════════════════════════════════════════ */
     .grade-card {
       position: relative;
       isolation: isolate;
@@ -110,11 +107,11 @@
         transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
         box-shadow 0.4s ease,
         border-color 0.4s ease;
+      cursor: pointer;
     }
     @media (min-width: 768px) {
       .grade-card { min-height: 260px; }
     }
-
     .grade-card:active {
       transform: scale(0.97);
     }
@@ -123,8 +120,6 @@
         transform: translateY(-6px) scale(1.02);
       }
     }
-
-    /* Glowing border gradient (CSS mask technique) */
     .grade-card::before {
       content: '';
       position: absolute;
@@ -143,9 +138,66 @@
       .grade-card:hover::before { opacity: 1; }
     }
 
-    /* ══════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
+       BOOK CARD
+       ══════════════════════════════════════════════════════════════ */
+    .book-card {
+      transition:
+        opacity 0.35s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
+    }
+    .book-card:active {
+      transform: scale(0.98);
+    }
+    @media (hover: hover) {
+      .book-card:hover {
+        transform: translateY(-6px);
+      }
+    }
+    .book-cover {
+      position: relative;
+      overflow: hidden;
+    }
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to top, rgba(0,0,0,0.45), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       FILTER PILLS
+       ══════════════════════════════════════════════════════════════ */
+    .filter-pill {
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+
+    /* ══════════════════════════════════════════════════════════════
        GRADIENT TEXT
-       ══════════════════════════════════════════════════ */
+       ══════════════════════════════════════════════════════════════ */
     .gradient-text {
       background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
       -webkit-background-clip: text;
@@ -153,9 +205,55 @@
       background-clip: text;
     }
 
-    /* ══════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
+       DOWNLOAD BUTTON SHIMMER
+       ══════════════════════════════════════════════════════════════ */
+    .btn-download {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 44px;
+    }
+    .btn-download::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.04) 60%,
+        transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       ENTRANCE STAGGER
+       ══════════════════════════════════════════════════════════════ */
+    .entrance-1  { animation: slide-up 0.6s ease-out 0.05s both; }
+    .entrance-2  { animation: slide-up 0.6s ease-out 0.12s both; }
+    .entrance-3  { animation: slide-up 0.6s ease-out 0.20s both; }
+    .entrance-4  { animation: slide-up 0.6s ease-out 0.28s both; }
+    .entrance-5  { animation: slide-up 0.6s ease-out 0.36s both; }
+
+    .entrance-b-1  { animation: slide-up 0.5s ease-out 0.02s both; }
+    .entrance-b-2  { animation: slide-up 0.5s ease-out 0.05s both; }
+    .entrance-b-3  { animation: slide-up 0.5s ease-out 0.08s both; }
+    .entrance-b-4  { animation: slide-up 0.5s ease-out 0.11s both; }
+    .entrance-b-5  { animation: slide-up 0.5s ease-out 0.14s both; }
+    .entrance-b-6  { animation: slide-up 0.5s ease-out 0.17s both; }
+    .entrance-b-7  { animation: slide-up 0.5s ease-out 0.20s both; }
+    .entrance-b-8  { animation: slide-up 0.5s ease-out 0.23s both; }
+    .entrance-b-9  { animation: slide-up 0.5s ease-out 0.26s both; }
+    .entrance-b-10 { animation: slide-up 0.5s ease-out 0.29s both; }
+    .entrance-b-11 { animation: slide-up 0.5s ease-out 0.32s both; }
+    .entrance-b-12 { animation: slide-up 0.5s ease-out 0.35s both; }
+
+    /* ══════════════════════════════════════════════════════════════
        BUTTON SHIMMER
-       ══════════════════════════════════════════════════ */
+       ══════════════════════════════════════════════════════════════ */
     .btn-shimmer {
       background: linear-gradient(
         110deg,
@@ -169,18 +267,9 @@
       animation: shimmer 3s linear infinite;
     }
 
-    /* ══════════════════════════════════════════════════
-       ENTRANCE STAGGER
-       ══════════════════════════════════════════════════ */
-    .entrance-1 { animation: slide-up 0.6s ease-out 0.05s both; }
-    .entrance-2 { animation: slide-up 0.6s ease-out 0.12s both; }
-    .entrance-3 { animation: slide-up 0.6s ease-out 0.20s both; }
-    .entrance-4 { animation: slide-up 0.6s ease-out 0.28s both; }
-    .entrance-5 { animation: slide-up 0.6s ease-out 0.36s both; }
-
-    /* ══════════════════════════════════════════════════
-       SCROLLBAR
-       ══════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       SCROLLBAR & SELECTION
+       ══════════════════════════════════════════════════════════════ */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #020617; }
     ::-webkit-scrollbar-thumb {
@@ -188,54 +277,105 @@
       border-radius: 3px;
     }
     html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
-
-    /* ══════════════════════════════════════════════════
-       SELECTION
-       ══════════════════════════════════════════════════ */
     ::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+    .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
 
-    /* ══════════════════════════════════════════════════
-       NAV SAFE AREA (notch / status bar)
-       ══════════════════════════════════════════════════ */
-    .nav-safe {
-      padding-top: env(safe-area-inset-top, 0px);
+    /* ══════════════════════════════════════════════════════════════
+       ALPINE x-cloak
+       ══════════════════════════════════════════════════════════════ */
+    [x-cloak] { display: none !important; }
+
+    /* ══════════════════════════════════════════════════════════════
+       ACCENT THEME — CSS custom properties per grade (RGB values)
+       Used for download button hover states and other accent-driven styles
+       ══════════════════════════════════════════════════════════════ */
+    .accent-sky     { --a3: #7dd3fc; --a6r:   2,132,199; --a7r:   3,105,161; --a5r:  14,165,233; }
+    .accent-amber   { --a3: #fcd34d; --a6r: 217,119,  6; --a7r: 180, 83,  9; --a5r: 245,158, 11; }
+    .accent-teal    { --a3: #5eead4; --a6r:  13,148,136; --a7r:  15,118,110; --a5r:  20,184,166; }
+    .accent-pink    { --a3: #f9a8d4; --a6r: 219, 39,119; --a7r: 190, 24, 93; --a5r: 236, 72,153; }
+    .accent-orange  { --a3: #fdba74; --a6r: 234, 88, 12; --a7r: 194, 65, 12; --a5r: 249,115, 22; }
+    .accent-indigo  { --a3: #a5b4fc; --a6r:  79, 70,229; --a7r:  67, 56,202; --a5r:  99,102,241; }
+    .accent-cyan    { --a3: #67e8f9; --a6r:   8,145,178; --a7r:  14,116,144; --a5r:   6,182,212; }
+    .accent-blue    { --a3: #93c5fd; --a6r:  37, 99,235; --a7r:  29, 78,216; --a5r:  59,130,246; }
+    .accent-emerald { --a3: #6ee7b7; --a6r:   5,150,105; --a7r:   4,120, 87; --a5r:  16,185,129; }
+    .accent-violet  { --a3: #c4b5fd; --a6r: 124, 58,237; --a7r: 109, 40,217; --a5r: 139, 92,246; }
+    .accent-fuchsia { --a3: #f0abfc; --a6r: 192, 38,211; --a7r: 162, 28,175; --a5r: 217, 70,239; }
+
+    .btn-download-accent:hover {
+      background: linear-gradient(135deg, rgba(var(--a6r), 0.2), rgba(var(--a7r), 0.1)) !important;
+      border-color: rgba(var(--a5r), 0.3) !important;
+      color: var(--a3) !important;
+      box-shadow: 0 10px 15px -3px rgba(var(--a5r), 0.1) !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       HOVER PILL PREFERENCE
+       ══════════════════════════════════════════════════════════════ */
+    @media (hover: hover) {
+      .pill-hover-ar:hover    { background: rgba(5, 150, 105, 0.05); border-color: rgba(5, 150, 105, 0.3); color: #6ee7b7; }
+      .pill-hover-math:hover  { background: rgba(37, 99, 235, 0.05); border-color: rgba(37, 99, 235, 0.3); color: #93c5fd; }
+      .pill-hover-en:hover    { background: rgba(217, 119, 6, 0.05); border-color: rgba(217, 119, 6, 0.3); color: #fcd34d; }
+      .pill-hover-ch:hover    { background: rgba(124, 58, 237, 0.05); border-color: rgba(124, 58, 237, 0.3); color: #c4b5fd; }
+      .pill-hover-ph:hover    { background: rgba(6, 182, 212, 0.05); border-color: rgba(6, 182, 212, 0.3); color: #67e8f9; }
     }
   </style>
 </head>
-<body>
+<body x-data="app()" :class="`accent-${selectedGrade?.accentColor || 'cyan'}`">
 
-  <!-- ══════════════════════════════════════════════════
-       DECORATIVE FLOATING ORBS (z-0, non-interactive)
-       ══════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════
+       DECORATIVE FLOATING ORBS
+       ══════════════════════════════════════════════════════════════ -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
     <div class="absolute -top-40 -right-40 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/8 rounded-full blur-[100px] animate-float"></div>
     <div class="absolute -bottom-40 -left-40 w-80 sm:w-[30rem] h-80 sm:h-[30rem] bg-indigo-500/8 rounded-full blur-[120px] animate-float-delayed"></div>
     <div class="absolute top-1/3 left-1/4 w-48 sm:w-64 h-48 sm:h-64 bg-blue-500/5 rounded-full blur-[80px] animate-float" style="animation-delay: 1.8s;"></div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       NAVBAR — Fully responsive, glassmorphism
-       ══════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════
+       NAVBAR
+       ══════════════════════════════════════════════════════════════ -->
   <nav class="relative z-50 nav-safe">
     <div class="glass-strong fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] sm:w-[calc(100%-2rem)] max-w-6xl rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl shadow-cyan-500/5">
 
-      <!-- Logo — always visible -->
-      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+      <!-- Logo -->
+      <button @click="goToDashboard()" class="flex items-center gap-2 sm:gap-3 group shrink-0">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
           <i class="fa-solid fa-book-open text-white text-sm sm:text-lg"></i>
         </div>
         <span class="text-white font-bold text-base sm:text-xl tracking-tight">مكتبة <span class="gradient-text">مدار</span></span>
-      </a>
+      </button>
 
-      <!-- Desktop nav links (hidden on mobile) -->
-      <div class="hidden md:flex items-center gap-6">
-        <a href="index.html" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">الرئيسية</a>
+      <!-- Desktop nav links — Dashboard -->
+      <div x-show="currentView === 'dashboard'" class="hidden md:flex items-center gap-6">
+        <button @click="goToDashboard()" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">الرئيسية</button>
         <a href="#grades" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">الصفوف</a>
         <a href="#features" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">المميزات</a>
       </div>
 
-      <!-- Desktop external link button -->
-      <a href="https://madarcore.onrender.com"
+      <!-- Desktop nav links — Grade View -->
+      <div x-show="currentView === 'grade'" class="hidden md:flex items-center gap-6">
+        <button @click="goToDashboard()" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">
+          <i class="fa-solid fa-house ml-1.5"></i>الرئيسية
+        </button>
+        <span class="text-cyan-300 text-sm font-medium">
+          <i class="fa-solid fa-book ml-1.5"></i><span x-text="`الصف ${selectedGrade?.nameArabic || ''}`"></span>
+        </span>
+      </div>
+
+      <!-- Desktop back button (Grade view only) -->
+      <button x-show="currentView === 'grade'"
+              @click="goToDashboard()"
+              class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
+                     text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
+                     hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
+                     transition-all duration-300 shrink-0">
+        <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+        العودة للصفوف
+      </button>
+
+      <!-- Desktop external link (Dashboard only) -->
+      <a x-show="currentView === 'dashboard'"
+         href="https://madarcore.onrender.com"
          class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
                 text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
                 hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
@@ -244,421 +384,314 @@
         <span class="hidden xs:inline">الرجوع للموقع</span>
       </a>
 
-      <!-- Mobile hamburger button -->
-      <button id="mobileMenuBtn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
+      <!-- Mobile hamburger -->
+      <button @click="mobileMenuOpen = true" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
         <i class="fa-solid fa-bars text-lg"></i>
       </button>
     </div>
   </nav>
 
-  <!-- ══════════════════════════════════════════════════
-       HERO SECTION
-       ══════════════════════════════════════════════════ -->
-  <section class="relative z-10 pt-28 pb-12 sm:pt-36 sm:pb-16 md:pt-44 md:pb-20 px-4">
-    <div class="max-w-5xl mx-auto text-center">
+  <!-- ══════════════════════════════════════════════════════════════
+       VIEW: DASHBOARD
+       ══════════════════════════════════════════════════════════════ -->
+  <div x-show="currentView === 'dashboard'">
 
-      <!-- Hero badge -->
-      <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs sm:text-sm font-medium mb-4 sm:mb-6 entrance-1">
-        <i class="fa-solid fa-graduation-cap text-xs sm:text-sm"></i>
-        <span>المكتبة الرقمية للكتب المدرسية</span>
-      </div>
+    <!-- ─── HERO ─── -->
+    <section class="relative z-10 pt-28 pb-12 sm:pt-36 sm:pb-16 md:pt-44 md:pb-20 px-4">
+      <div class="max-w-5xl mx-auto text-center">
 
-      <!-- Heading — scales down beautifully on mobile -->
-      <h1 class="text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 entrance-2">
-        <span class="gradient-text">مكتبة مدار</span>
-        <br>
-        <span class="text-white/90">الرقمية</span>
-      </h1>
-
-      <!-- Subtitle -->
-      <p class="text-slate-400 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3">
-        حمل جميع كتبك المدرسية من
-        <span class="text-cyan-300 font-semibold">الصف الأول</span>
-        إلى
-        <span class="text-violet-300 font-semibold">الصف الثاني عشر</span>
-        بضغطة زر واحدة. سهل، سريع، ومتاح دائماً.
-      </p>
-
-      <!-- CTA buttons — stack on smallest screens -->
-      <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-10 entrance-4">
-        <a href="#grades"
-           class="group relative inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base
-                  bg-gradient-to-r from-cyan-500 to-blue-600 text-white
-                  shadow-lg shadow-cyan-500/20
-                  hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.98]
-                  transition-all duration-300 overflow-hidden min-h-[48px]">
-          <span class="relative z-10">تصفح الكتب</span>
-          <i class="fa-solid fa-arrow-down relative z-10 group-hover:translate-y-0.5 transition-transform text-xs sm:text-sm"></i>
-          <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        </a>
-        <a href="#features"
-           class="group inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base min-h-[48px]
-                  border border-slate-700 text-slate-300
-                  hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.98]
-                  transition-all duration-300">
-          <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-xs sm:text-sm"></i>
-          <span>المميزات</span>
-        </a>
-      </div>
-
-      <!-- Stats row — wraps on mobile -->
-      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-16 mt-12 sm:mt-16 entrance-5">
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">١٢</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">صف دراسي</div>
-        </div>
-        <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">+١٢٠</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">كتاب مدرسي</div>
-        </div>
-        <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">٥</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">مواد دراسية</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════
-       GRADES SECTION
-       ══════════════════════════════════════════════════ -->
-  <section id="grades" class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24">
-    <div class="max-w-6xl mx-auto">
-
-      <!-- Section header -->
-      <div class="text-center mb-8 sm:mb-10 md:mb-12">
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">اختر صفك الدراسي</h2>
-        <p class="text-slate-400 text-sm sm:text-base">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
-      </div>
-
-      <!-- Grade grid: 1 col mobile → 2 col tablet → 4 col desktop -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-
-        <!-- ═══ GRADE 1 ═══ -->
-        <a href="1_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900
-                  border border-slate-800/60 hover:border-sky-500/40
-                  shadow-lg shadow-sky-950/30
-                  hover:shadow-2xl hover:shadow-sky-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/15 group-hover:shadow-sky-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">١</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الأول</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 1</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-sky-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 2 ═══ -->
-        <a href="2_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900
-                  border border-slate-800/60 hover:border-amber-500/40
-                  shadow-lg shadow-amber-950/30
-                  hover:shadow-2xl hover:shadow-amber-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/15 group-hover:shadow-amber-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٢</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الثاني</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 2</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-amber-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 3 ═══ -->
-        <a href="3_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900
-                  border border-slate-800/60 hover:border-teal-500/40
-                  shadow-lg shadow-teal-950/30
-                  hover:shadow-2xl hover:shadow-teal-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/15 group-hover:shadow-teal-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٣</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الثالث</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 3</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-teal-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 4 ═══ -->
-        <a href="4_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-pink-950 to-slate-900
-                  border border-slate-800/60 hover:border-pink-500/40
-                  shadow-lg shadow-pink-950/30
-                  hover:shadow-2xl hover:shadow-pink-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center shadow-lg shadow-pink-500/15 group-hover:shadow-pink-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٤</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الرابع</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 4</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-pink-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 5 ═══ -->
-        <a href="5_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-orange-950 to-slate-900
-                  border border-slate-800/60 hover:border-orange-500/40
-                  shadow-lg shadow-orange-950/30
-                  hover:shadow-2xl hover:shadow-orange-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/15 group-hover:shadow-orange-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٥</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الخامس</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 5</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-orange-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 6 ═══ -->
-        <a href="6_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900
-                  border border-slate-800/60 hover:border-indigo-500/40
-                  shadow-lg shadow-indigo-950/30
-                  hover:shadow-2xl hover:shadow-indigo-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-400 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/15 group-hover:shadow-indigo-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٦</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف السادس</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 6</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-indigo-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 7 ═══ -->
-        <a href="7_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-cyan-950 to-slate-900
-                  border border-slate-800/60 hover:border-cyan-500/40
-                  shadow-lg shadow-cyan-950/30
-                  hover:shadow-2xl hover:shadow-cyan-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٧</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف السابع</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 7</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-cyan-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 8 ═══ -->
-        <a href="8_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900
-                  border border-slate-800/60 hover:border-blue-500/40
-                  shadow-lg shadow-blue-950/30
-                  hover:shadow-2xl hover:shadow-blue-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/15 group-hover:shadow-blue-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٨</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الثامن</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 8</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-blue-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 9 ═══ -->
-        <a href="9_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900
-                  border border-slate-800/60 hover:border-indigo-500/40
-                  shadow-lg shadow-indigo-950/30
-                  hover:shadow-2xl hover:shadow-indigo-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/15 group-hover:shadow-indigo-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">٩</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف التاسع</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 9</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-indigo-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 10 ═══ -->
-        <a href="10_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900
-                  border border-slate-800/60 hover:border-emerald-500/40
-                  shadow-lg shadow-emerald-950/30
-                  hover:shadow-2xl hover:shadow-emerald-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/15 group-hover:shadow-emerald-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">١٠</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف العاشر</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 10</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-emerald-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 11 ═══ -->
-        <a href="11_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900
-                  border border-slate-800/60 hover:border-violet-500/40
-                  shadow-lg shadow-violet-950/30
-                  hover:shadow-2xl hover:shadow-violet-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/15 group-hover:shadow-violet-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">١١</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الحادي عشر</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 11</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-violet-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-        <!-- ═══ GRADE 12 ═══ -->
-        <a href="12_book.html"
-           class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between
-                  bg-gradient-to-br from-slate-900 via-fuchsia-950 to-slate-900
-                  border border-slate-800/60 hover:border-fuchsia-500/40
-                  shadow-lg shadow-fuchsia-950/30
-                  hover:shadow-2xl hover:shadow-fuchsia-500/10">
-          <div class="absolute inset-0 bg-gradient-to-t from-fuchsia-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-fuchsia-400 to-purple-600 flex items-center justify-center shadow-lg shadow-fuchsia-500/15 group-hover:shadow-fuchsia-500/35 transition-shadow duration-300">
-              <span class="text-white text-xl sm:text-2xl font-bold">١٢</span>
-            </div>
-            <span class="px-2.5 sm:px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300 text-[10px] sm:text-xs font-medium">١٠ كتب</span>
-          </div>
-          <div class="mt-auto pt-6">
-            <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5">الصف الثاني عشر</h3>
-            <p class="text-slate-400 text-xs sm:text-sm">Grade 12</p>
-          </div>
-          <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
-            <i class="fa-solid fa-arrow-left text-fuchsia-400 text-xs sm:text-sm"></i>
-          </div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════
-       FEATURES SECTION
-       ══════════════════════════════════════════════════ -->
-  <section id="features" class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-8 sm:mb-10 md:mb-12">
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">لماذا مكتبة مدار؟</h2>
-        <p class="text-slate-400 text-sm sm:text-base">مميزات تجعل تجربة التحميل سهلة وممتعة</p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-
-        <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-cyan-500/20 transition-all duration-300">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <i class="fa-solid fa-bolt text-cyan-400 text-lg sm:text-xl"></i>
-          </div>
-          <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">تحميل سريع</h3>
-          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">جميع الكتب متاحة بصيغة PDF للتحميل المباشر بدون انتظار</p>
+        <!-- Hero badge -->
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs sm:text-sm font-medium mb-4 sm:mb-6 entrance-1">
+          <i class="fa-solid fa-graduation-cap text-xs sm:text-sm"></i>
+          <span>المكتبة الرقمية للكتب المدرسية</span>
         </div>
 
-        <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-indigo-500/20 transition-all duration-300">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <i class="fa-solid fa-mobile-screen text-indigo-400 text-lg sm:text-xl"></i>
-          </div>
-          <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">متجاوب بالكامل</h3>
-          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">تصفح مريح على جميع الأجهزة - موبايل، تابلت، أو كمبيوتر</p>
+        <!-- Heading -->
+        <h1 class="text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 entrance-2">
+          <span class="gradient-text">مكتبة مدار</span>
+          <br>
+          <span class="text-white/90">الرقمية</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-slate-400 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3">
+          حمل جميع كتبك المدرسية من
+          <span class="text-cyan-300 font-semibold">الصف الأول</span>
+          إلى
+          <span class="text-violet-300 font-semibold">الصف الثاني عشر</span>
+          بضغطة زر واحدة. سهل، سريع، ومتاح دائماً.
+        </p>
+
+        <!-- CTA buttons -->
+        <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-10 entrance-4">
+          <a href="#grades"
+             class="group relative inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base
+                    bg-gradient-to-r from-cyan-500 to-blue-600 text-white
+                    shadow-lg shadow-cyan-500/20
+                    hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.98]
+                    transition-all duration-300 overflow-hidden min-h-[48px]">
+            <span class="relative z-10">تصفح الكتب</span>
+            <i class="fa-solid fa-arrow-down relative z-10 group-hover:translate-y-0.5 transition-transform text-xs sm:text-sm"></i>
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </a>
+          <a href="#features"
+             class="group inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base min-h-[48px]
+                    border border-slate-700 text-slate-300
+                    hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.98]
+                    transition-all duration-300">
+            <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-xs sm:text-sm"></i>
+            <span>المميزات</span>
+          </a>
         </div>
 
-        <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-violet-500/20 transition-all duration-300 sm:col-span-2 md:col-span-1">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-violet-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <i class="fa-solid fa-leaf text-violet-400 text-lg sm:text-xl"></i>
+        <!-- Stats row -->
+        <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-16 mt-12 sm:mt-16 entrance-5">
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text" x-text="toArNum(12)"></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">صف دراسي</div>
           </div>
-          <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">مصمم ببساطة</h3>
-          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">واجهة نظيفة ومرتبة تركز على ما يهمك - الكتب الدراسية</p>
+          <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text">+<span x-text="toArNum(120)"></span></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">كتاب مدرسي</div>
+          </div>
+          <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text" x-text="toArNum(5)"></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">مواد دراسية</div>
+          </div>
         </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ══════════════════════════════════════════════════
+    <!-- ─── GRADES GRID ─── -->
+    <section id="grades" class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24">
+      <div class="max-w-6xl mx-auto">
+
+        <!-- Section header -->
+        <div class="text-center mb-8 sm:mb-10 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">اختر صفك الدراسي</h2>
+          <p class="text-slate-400 text-sm sm:text-base">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
+        </div>
+
+        <!-- Grade grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+          <template x-for="(grade, i) in grades" :key="grade.number">
+            <button @click="selectGrade(grade)"
+                    :style="{
+                      background: grade.cardBg,
+                      borderColor: 'rgba(30, 41, 59, 0.6)'
+                    }"
+                    class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between border shadow-lg text-right w-full"
+                    :class="[`shadow-${grade.accentColor}-950/30`, `entrance-${Math.min(i + 1, 5)}`]">
+              <!-- Hover overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <!-- Top row -->
+              <div class="flex items-start justify-between w-full relative z-10">
+                <!-- Icon circle -->
+                <div :style="{ background: grade.iconGradient }"
+                     class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg"
+                     :class="`shadow-${grade.accentColor}-500/15 group-hover:shadow-${grade.accentColor}-500/35`">
+                  <span class="text-white text-xl sm:text-2xl font-bold" x-text="toArNum(grade.number)"></span>
+                </div>
+                <!-- Book count badge -->
+                <span :class="`px-2.5 sm:px-3 py-1 rounded-full ${grade.badgeClass} text-[10px] sm:text-xs font-medium`">
+                  <span x-text="`${toArNum(grade.bookCount)} كتب`"></span>
+                </span>
+              </div>
+              <!-- Bottom text -->
+              <div class="mt-auto pt-6 relative z-10 w-full text-right">
+                <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5" x-text="`الصف ${grade.nameArabic}`"></h3>
+                <p class="text-slate-400 text-xs sm:text-sm" x-text="grade.nameEnglish"></p>
+              </div>
+              <!-- Arrow icon -->
+              <div :style="{ color: grade.arrowCSS }"
+                   class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
+                <i class="fa-solid fa-arrow-left text-xs sm:text-sm" :style="{ color: grade.arrowCSS }"></i>
+              </div>
+            </button>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── FEATURES ─── -->
+    <section id="features" class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-8 sm:mb-10 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">لماذا مكتبة مدار؟</h2>
+          <p class="text-slate-400 text-sm sm:text-base">مميزات تجعل تجربة التحميل سهلة وممتعة</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-cyan-500/20 transition-all duration-300">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-bolt text-cyan-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">تحميل سريع</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">جميع الكتب متاحة بصيغة PDF للتحميل المباشر بدون انتظار</p>
+          </div>
+
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-indigo-500/20 transition-all duration-300">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-mobile-screen text-indigo-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">متجاوب بالكامل</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">تصفح مريح على جميع الأجهزة - موبايل، تابلت، أو كمبيوتر</p>
+          </div>
+
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-violet-500/20 transition-all duration-300 sm:col-span-2 md:col-span-1">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-violet-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-leaf text-violet-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">مصمم ببساطة</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">واجهة نظيفة ومرتبة تركز على ما يهمك - الكتب الدراسية</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /DASHBOARD VIEW -->
+
+  <!-- ══════════════════════════════════════════════════════════════
+       VIEW: GRADE
+       ══════════════════════════════════════════════════════════════ -->
+  <div x-show="currentView === 'grade'" x-cloak>
+
+    <!-- ─── GRADE HEADER ─── -->
+    <section class="relative z-10 pt-28 pb-6 sm:pt-36 sm:pb-8 md:pt-44 md:pb-10 px-4">
+      <div class="max-w-6xl mx-auto">
+
+        <!-- Breadcrumb -->
+        <div class="hidden xs:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 entrance-1">
+          <button @click="goToDashboard()" class="hover:text-cyan-400 transition-colors">الرئيسية</button>
+          <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs text-slate-700"></i>
+          <span class="text-cyan-400" x-text="`الصف ${selectedGrade?.nameArabic || ''}`"></span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <!-- Left: title -->
+          <div class="entrance-2">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span x-text="`الصف ${selectedGrade?.nameArabic || ''} - ${toArNum(selectedGrade?.bookCount || 0)} كتب متاحة`"></span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+              كتب <span class="gradient-text" x-text="`الصف ${selectedGrade?.nameArabic || ''}`"></span>
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base mt-1.5 sm:mt-2">اختر المادة الدراسية ثم حمل الكتاب بنقرة واحدة</p>
+          </div>
+
+          <!-- Right: mobile back button -->
+          <button @click="goToDashboard()"
+                  class="sm:hidden inline-flex items-center justify-center gap-2 w-full xs:w-auto px-5 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-700/60 active:scale-[0.98] transition-all duration-200 entrance-3 min-h-[44px]">
+            <i class="fa-solid fa-arrow-right"></i>
+            العودة للصفوف
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── FILTER BAR ─── -->
+    <section class="relative z-10 px-4 pb-4 sm:pb-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="overflow-x-auto md:overflow-visible filter-scroll -mx-4 px-4 md:mx-0 md:px-0">
+          <div class="glass rounded-xl sm:rounded-2xl p-1.5 sm:p-2 inline-flex flex-nowrap md:flex-wrap items-center gap-1.5 sm:gap-2 min-w-max md:min-w-0">
+            <!-- "All" pill -->
+            <button @click="activeFilter = 'all'"
+                    :class="`filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border transition-all duration-300 ${
+                      activeFilter === 'all'
+                        ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5'
+                        : 'border-slate-700 text-slate-400 hover:bg-cyan-500/5 hover:border-cyan-500/30 hover:text-cyan-300'
+                    }`"
+                    type="button">
+              <i class="fa-solid fa-layer-group ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i>
+              الكل
+            </button>
+
+            <!-- Subject pills -->
+            <template x-for="s in (selectedGrade?.subjects || [])" :key="s.key">
+              <button @click="activeFilter = s.key"
+                      :class="`filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border transition-all duration-300 ${
+                        activeFilter === s.key
+                          ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5'
+                          : `border-slate-700 text-slate-400 ${s.hoverClass}`
+                      }`"
+                      type="button">
+                <i :class="`fa-solid ${s.icon} ml-1 sm:ml-1.5 text-[10px] sm:text-xs`"></i>
+                <span x-text="s.label"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── BOOKS GRID ─── -->
+    <section class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24">
+      <div class="max-w-6xl mx-auto">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+          <template x-for="(item, index) in filteredBookItems" :key="`${item.code}-${item.term}`">
+            <div class="book-card rounded-xl sm:rounded-2xl overflow-hidden
+                        bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800/50
+                        shadow-lg shadow-slate-900/50 hover:shadow-xl
+                        flex flex-col"
+                 :class="`entrance-b-${Math.min(index + 1, 12)}`">
+              <!-- Cover -->
+              <div class="book-cover h-36 sm:h-40 md:h-44 bg-gradient-to-br flex items-center justify-center"
+                   :class="item.coverGradient">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                  <i :class="`fa-solid ${item.icon} text-white/80 text-2xl sm:text-3xl`"></i>
+                </div>
+              </div>
+              <!-- Info -->
+              <div class="p-4 sm:p-5 flex flex-col flex-1">
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                  <span class="text-slate-400 text-[10px] sm:text-xs font-medium" x-text="item.subject"></span>
+                  <span class="px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm"
+                        :class="item.badgeClass">
+                    <i class="fa-solid fa-star ml-1 text-[8px] sm:text-[10px]"></i>
+                    <span x-text="item.label"></span>
+                  </span>
+                </div>
+                <h3 class="text-white font-bold text-sm sm:text-base mb-0.5 sm:mb-1" x-text="item.subject"></h3>
+                <p class="text-slate-500 text-[10px] sm:text-xs mb-3 sm:mb-4" x-text="`للصف ${selectedGrade?.nameArabic || ''} - ${item.label}`"></p>
+                <div class="mt-auto">
+                  <a :download="item.path"
+                     :href="item.path"
+                     target="_blank"
+                     class="btn-download btn-download-accent group flex items-center justify-center gap-2 w-full px-3 sm:px-4 py-2.5 sm:py-3
+                            rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold min-h-[44px]
+                            bg-gradient-to-r from-slate-700/40 to-slate-800/30
+                            border border-slate-600/30 text-slate-300
+                            active:scale-[0.98] transition-all duration-300">
+                    <i class="fa-solid fa-download group-hover:-translate-y-0.5 transition-transform text-[10px] sm:text-xs"></i>
+                    <span>تحميل الكتاب</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Empty state -->
+        <div x-show="filteredBookItems.length === 0" class="text-center py-16 sm:py-20">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center mx-auto mb-5 sm:mb-6">
+            <i class="fa-solid fa-book-open text-slate-600 text-2xl sm:text-3xl"></i>
+          </div>
+          <h3 class="text-lg sm:text-xl font-bold text-slate-300 mb-1.5 sm:mb-2">لا توجد كتب في هذا التصنيف</h3>
+          <p class="text-slate-500 text-sm">اختر تصنيفاً آخر لعرض الكتب المتاحة</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /GRADE VIEW -->
+
+  <!-- ══════════════════════════════════════════════════════════════
        FOOTER
-       ══════════════════════════════════════════════════ -->
+       ══════════════════════════════════════════════════════════════ -->
   <footer class="relative z-10 border-t border-slate-800/60">
     <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
@@ -666,74 +699,429 @@
           <i class="fa-regular fa-copyright text-[10px] sm:text-sm"></i>
           <span>جميع الحقوق محفوظة لمكتبة <span class="text-cyan-400 font-semibold">مدار</span> 2024</span>
         </div>
-        <div class="text-slate-500 text-[10px] sm:text-xs">
-          صنع بـ <i class="fa-solid fa-heart text-cyan-400 text-[10px] sm:text-xs"></i> لخدمة الطلاب
+        <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500">
+          <template x-if="currentView === 'dashboard'">
+            <span class="text-slate-500 text-[10px] sm:text-xs">
+              صنع بـ <i class="fa-solid fa-heart text-cyan-400 text-[10px] sm:text-xs"></i> لخدمة الطلاب
+            </span>
+          </template>
+          <template x-if="currentView === 'grade'">
+            <span class="flex items-center gap-3 sm:gap-4">
+              <button @click="goToDashboard()" class="hover:text-cyan-400 transition-colors">الرئيسية</button>
+              <span class="text-slate-700">|</span>
+              <span class="text-cyan-400" x-text="`الصف ${selectedGrade?.nameArabic || ''}`"></span>
+            </span>
+          </template>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- ══════════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════════════════════════
        MOBILE MENU OVERLAY
-       ══════════════════════════════════════════════════ -->
-  <div id="mobileMenu" class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl hidden">
+       ══════════════════════════════════════════════════════════════ -->
+  <div x-show="mobileMenuOpen" x-cloak
+       class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl"
+       @click.self="mobileMenuOpen = false">
     <div class="flex flex-col items-center justify-center h-full gap-8 px-6">
-      <button id="closeMobileMenu" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+      <button @click="mobileMenuOpen = false" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
         <i class="fa-solid fa-xmark text-2xl"></i>
       </button>
 
-      <a href="index.html" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</a>
-      <a href="#grades" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors" onclick="closeMobileMenuFn()">الصفوف</a>
-      <a href="#features" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors" onclick="closeMobileMenuFn()">المميزات</a>
+      <!-- Dashboard menu items -->
+      <template x-if="currentView === 'dashboard'">
+        <div class="flex flex-col items-center gap-8">
+          <button @click="mobileMenuOpen = false; goToDashboard()" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</button>
+          <a href="#grades" @click="mobileMenuOpen = false" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors">الصفوف</a>
+          <a href="#features" @click="mobileMenuOpen = false" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors">المميزات</a>
+          <div class="mt-2 h-px w-32 bg-slate-800"></div>
+          <a href="https://madarcore.onrender.com"
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+            <i class="fa-solid fa-arrow-right"></i>
+            الرجوع للموقع
+          </a>
+        </div>
+      </template>
 
-      <div class="mt-4 h-px w-32 bg-slate-800"></div>
-
-      <a href="https://madarcore.onrender.com"
-         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
-        <i class="fa-solid fa-arrow-right"></i>
-        الرجوع للموقع
-      </a>
+      <!-- Grade menu items -->
+      <template x-if="currentView === 'grade'">
+        <div class="flex flex-col items-center gap-8">
+          <button @click="mobileMenuOpen = false; goToDashboard()" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</button>
+          <span class="text-2xl sm:text-3xl text-cyan-400 font-semibold" x-text="`الصف ${selectedGrade?.nameArabic || ''}`"></span>
+          <!-- Mobile quick filters -->
+          <div class="flex flex-wrap justify-center gap-2.5 mt-2 px-4">
+            <template x-for="s in (selectedGrade?.subjects || [])" :key="s.key">
+              <button @click="activeFilter = s.key; mobileMenuOpen = false"
+                      class="px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors">
+                <i :class="`fa-solid ${s.icon} ml-1.5`"></i>
+                <span x-text="s.label"></span>
+              </button>
+            </template>
+          </div>
+          <div class="mt-2 h-px w-32 bg-slate-800"></div>
+          <a href="https://madarcore.onrender.com"
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+            <i class="fa-solid fa-arrow-right"></i>
+            الرجوع للموقع
+          </a>
+        </div>
+      </template>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       JAVASCRIPT — Mobile Menu
-       ══════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════
+       PRE-DECLARED TAILWIND CLASSES FOR JIT SCANNING
+       These ensure all dynamic color combinations are generated.
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="hidden" aria-hidden="true">
+    <!-- Subject pill hover states (5 subjects) -->
+    <span class="hover:bg-emerald-500/5 hover:border-emerald-500/30 hover:text-emerald-300"></span>
+    <span class="hover:bg-blue-500/5 hover:border-blue-500/30 hover:text-blue-300"></span>
+    <span class="hover:bg-amber-500/5 hover:border-amber-500/30 hover:text-amber-300"></span>
+    <span class="hover:bg-purple-500/5 hover:border-purple-500/30 hover:text-purple-300"></span>
+    <span class="hover:bg-cyan-500/5 hover:border-cyan-500/30 hover:text-cyan-300"></span>
+    <!-- Grade card badge classes (12 grades) -->
+    <span class="bg-sky-500/10 border-sky-500/20 text-sky-300"></span>
+    <span class="bg-amber-500/10 border-amber-500/20 text-amber-300"></span>
+    <span class="bg-teal-500/10 border-teal-500/20 text-teal-300"></span>
+    <span class="bg-pink-500/10 border-pink-500/20 text-pink-300"></span>
+    <span class="bg-orange-500/10 border-orange-500/20 text-orange-300"></span>
+    <span class="bg-indigo-500/10 border-indigo-500/20 text-indigo-300"></span>
+    <span class="bg-cyan-500/10 border-cyan-500/20 text-cyan-300"></span>
+    <span class="bg-blue-500/10 border-blue-500/20 text-blue-300"></span>
+    <span class="bg-emerald-500/10 border-emerald-500/20 text-emerald-300"></span>
+    <span class="bg-violet-500/10 border-violet-500/20 text-violet-300"></span>
+    <span class="bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-300"></span>
+    <!-- Shadow safe guards -->
+    <span class="shadow-sky-950/30 shadow-amber-950/30 shadow-teal-950/30 shadow-pink-950/30 shadow-orange-950/30 shadow-indigo-950/30 shadow-cyan-950/30 shadow-blue-950/30 shadow-emerald-950/30 shadow-violet-950/30 shadow-fuchsia-950/30"></span>
+    <span class="shadow-sky-500/15 shadow-amber-500/15 shadow-teal-500/15 shadow-pink-500/15 shadow-orange-500/15 shadow-indigo-500/15 shadow-cyan-500/15 shadow-blue-500/15 shadow-emerald-500/15 shadow-violet-500/15 shadow-fuchsia-500/15"></span>
+    <span class="group-hover:shadow-sky-500/35 group-hover:shadow-amber-500/35 group-hover:shadow-teal-500/35 group-hover:shadow-pink-500/35 group-hover:shadow-orange-500/35 group-hover:shadow-indigo-500/35 group-hover:shadow-cyan-500/35 group-hover:shadow-blue-500/35 group-hover:shadow-emerald-500/35 group-hover:shadow-violet-500/35 group-hover:shadow-fuchsia-500/35"></span>
+    <!-- Filter pill active state -->
+    <span class="bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5"></span>
+    <!-- Semester badge classes -->
+    <span class="bg-emerald-500/10 border-emerald-500/20 text-emerald-300 shadow-emerald-500/5"></span>
+    <span class="bg-amber-500/10 border-amber-500/20 text-amber-300 shadow-amber-500/5"></span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ALPINE.JS APP
+       ══════════════════════════════════════════════════════════════ -->
   <script>
-    (function() {
-      'use strict';
-      var menuBtn = document.getElementById('mobileMenuBtn');
-      var mobileMenu = document.getElementById('mobileMenu');
-      var closeBtn = document.getElementById('closeMobileMenu');
-
-      if (!menuBtn || !mobileMenu || !closeBtn) return;
-
-      function openMenu() {
-        mobileMenu.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+    // ═══════════════════════════════════════════════════════════════
+    //  GRADE DATA — All 12 grades with their unique styling
+    // ═══════════════════════════════════════════════════════════════
+    const COMMON_BOOKS = [
+      {
+        subject: 'اللغة العربية',
+        code: 'ar',
+        icon: 'fa-book-quran',
+        coverGradient: 'from-emerald-600/40 via-emerald-800/30 to-slate-900',
+        semesters: [
+          { term: 1, label: 'الفصل الأول' },
+          { term: 2, label: 'الفصل الثاني' }
+        ]
+      },
+      {
+        subject: 'الرياضيات',
+        code: 'math',
+        icon: 'fa-square-root-variable',
+        coverGradient: 'from-blue-600/40 via-blue-800/30 to-slate-900',
+        semesters: [
+          { term: 1, label: 'الفصل الأول' },
+          { term: 2, label: 'الفصل الثاني' }
+        ]
+      },
+      {
+        subject: 'اللغة الانجليزية',
+        code: 'en',
+        icon: 'fa-language',
+        coverGradient: 'from-amber-600/40 via-amber-800/30 to-slate-900',
+        semesters: [
+          { term: 1, label: 'الفصل الأول' },
+          { term: 2, label: 'الفصل الثاني' }
+        ]
+      },
+      {
+        subject: 'الكيمياء',
+        code: 'ch',
+        icon: 'fa-flask',
+        coverGradient: 'from-purple-600/40 via-purple-800/30 to-slate-900',
+        semesters: [
+          { term: 1, label: 'الفصل الأول' },
+          { term: 2, label: 'الفصل الثاني' }
+        ]
+      },
+      {
+        subject: 'الفيزياء',
+        code: 'ph',
+        icon: 'fa-atom',
+        coverGradient: 'from-cyan-600/40 via-cyan-800/30 to-slate-900',
+        semesters: [
+          { term: 1, label: 'الفصل الأول' },
+          { term: 2, label: 'الفصل الثاني' }
+        ]
       }
+    ];
 
-      function closeMenu() {
-        mobileMenu.classList.add('hidden');
-        document.body.style.overflow = '';
+    // Subject hover classes for filter pills (per subject code)
+    const SUBJECT_HOVER = {
+      ar:   'pill-hover-ar',
+      math: 'pill-hover-math',
+      en:   'pill-hover-en',
+      ch:   'pill-hover-ch',
+      ph:   'pill-hover-ph'
+    };
+
+    // Semester badge styling
+    const SEMESTER_STYLES = {
+      1: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300 shadow-emerald-500/5',
+      2: 'bg-amber-500/10 border-amber-500/20 text-amber-300 shadow-amber-500/5'
+    };
+
+    // ─── All 12 Grades ───
+    const GRADES_DATA = [
+      {
+        number: 1,
+        nameArabic: 'الأول',
+        nameEnglish: 'Grade 1',
+        accentColor: 'sky',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #082f49 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-sky-500/40',
+        iconGradient: 'linear-gradient(135deg, #38bdf8, #2563eb)',
+        badgeClass: 'bg-sky-500/10 border-sky-500/20 text-sky-300',
+        arrowCSS: '#38bdf8',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 2,
+        nameArabic: 'الثاني',
+        nameEnglish: 'Grade 2',
+        accentColor: 'amber',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #451a03 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-amber-500/40',
+        iconGradient: 'linear-gradient(135deg, #fbbf24, #ea580c)',
+        badgeClass: 'bg-amber-500/10 border-amber-500/20 text-amber-300',
+        arrowCSS: '#fbbf24',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 3,
+        nameArabic: 'الثالث',
+        nameEnglish: 'Grade 3',
+        accentColor: 'teal',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-teal-500/40',
+        iconGradient: 'linear-gradient(135deg, #2dd4bf, #059669)',
+        badgeClass: 'bg-teal-500/10 border-teal-500/20 text-teal-300',
+        arrowCSS: '#2dd4bf',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 4,
+        nameArabic: 'الرابع',
+        nameEnglish: 'Grade 4',
+        accentColor: 'pink',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #500724 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-pink-500/40',
+        iconGradient: 'linear-gradient(135deg, #f472b6, #e11d48)',
+        badgeClass: 'bg-pink-500/10 border-pink-500/20 text-pink-300',
+        arrowCSS: '#f472b6',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 5,
+        nameArabic: 'الخامس',
+        nameEnglish: 'Grade 5',
+        accentColor: 'orange',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #431407 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-orange-500/40',
+        iconGradient: 'linear-gradient(135deg, #fb923c, #dc2626)',
+        badgeClass: 'bg-orange-500/10 border-orange-500/20 text-orange-300',
+        arrowCSS: '#fb923c',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 6,
+        nameArabic: 'السادس',
+        nameEnglish: 'Grade 6',
+        accentColor: 'indigo',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-indigo-500/40',
+        iconGradient: 'linear-gradient(135deg, #818cf8, #7c3aed)',
+        badgeClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300',
+        arrowCSS: '#818cf8',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 7,
+        nameArabic: 'السابع',
+        nameEnglish: 'Grade 7',
+        accentColor: 'cyan',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #083344 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-cyan-500/40',
+        iconGradient: 'linear-gradient(135deg, #22d3ee, #2563eb)',
+        badgeClass: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-300',
+        arrowCSS: '#22d3ee',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 8,
+        nameArabic: 'الثامن',
+        nameEnglish: 'Grade 8',
+        accentColor: 'blue',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #172554 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-blue-500/40',
+        iconGradient: 'linear-gradient(135deg, #60a5fa, #4f46e5)',
+        badgeClass: 'bg-blue-500/10 border-blue-500/20 text-blue-300',
+        arrowCSS: '#60a5fa',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 9,
+        nameArabic: 'التاسع',
+        nameEnglish: 'Grade 9',
+        accentColor: 'indigo',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-indigo-500/40',
+        iconGradient: 'linear-gradient(135deg, #818cf8, #7c3aed)',
+        badgeClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300',
+        arrowCSS: '#818cf8',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 10,
+        nameArabic: 'العاشر',
+        nameEnglish: 'Grade 10',
+        accentColor: 'emerald',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #022c22 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-emerald-500/40',
+        iconGradient: 'linear-gradient(135deg, #34d399, #0d9488)',
+        badgeClass: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+        arrowCSS: '#34d399',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 11,
+        nameArabic: 'الحادي عشر',
+        nameEnglish: 'Grade 11',
+        accentColor: 'violet',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #2e1065 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-violet-500/40',
+        iconGradient: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
+        badgeClass: 'bg-violet-500/10 border-violet-500/20 text-violet-300',
+        arrowCSS: '#a78bfa',
+        books: COMMON_BOOKS
+      },
+      {
+        number: 12,
+        nameArabic: 'الثاني عشر',
+        nameEnglish: 'Grade 12',
+        accentColor: 'fuchsia',
+        cardBg: 'linear-gradient(135deg, #0f172a 0%, #4a044e 50%, #0f172a 100%)',
+        cardHoverBorder: 'hover:border-fuchsia-500/40',
+        iconGradient: 'linear-gradient(135deg, #e879f9, #a21caf)',
+        badgeClass: 'bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-300',
+        arrowCSS: '#e879f9',
+        books: COMMON_BOOKS
       }
+    ];
 
-      menuBtn.addEventListener('click', openMenu);
-      closeBtn.addEventListener('click', closeMenu);
+    // ─── Arabic numeral converter ───
+    function toArabicNumeral(n) {
+      var digits = '٠١٢٣٤٥٦٧٨٩';
+      return String(n).split('').map(function(c) {
+        return digits[parseInt(c, 10)] || c;
+      }).join('');
+    }
 
-      // Close on backdrop click
-      mobileMenu.addEventListener('click', function(e) {
-        if (e.target === this) closeMenu();
-      });
+    // ═══════════════════════════════════════════════════════════════
+    //  ALPINE APP
+    // ═══════════════════════════════════════════════════════════════
+    function app() {
+      return {
+        currentView: 'dashboard',
+        selectedGrade: null,
+        activeFilter: 'all',
+        mobileMenuOpen: false,
 
-      // Close on Escape
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeMenu();
-      });
+        // ─── Computed: all grades with pre-computed book count ───
+        get grades() {
+          var self = this;
+          return GRADES_DATA.map(function(g) {
+            var count = 0;
+            g.books.forEach(function(b) {
+              count += b.semesters.length;
+            });
+            return Object.assign({}, g, {
+              bookCount: count,
+              subjects: self._extractSubjects(g.books)
+            });
+          });
+        },
 
-      // Expose for inline onclick
-      window.closeMobileMenuFn = closeMenu;
-    })();
+        // ─── Computed: filtered book items for current grade ───
+        get filteredBookItems() {
+          if (!this.selectedGrade) return [];
+          var items = [];
+          var self = this;
+          this.selectedGrade.books.forEach(function(b) {
+            b.semesters.forEach(function(sem) {
+              items.push({
+                subject: b.subject,
+                code: b.code,
+                icon: b.icon,
+                coverGradient: b.coverGradient,
+                term: sem.term,
+                label: sem.label,
+                path: 'books/grades/' + self.selectedGrade.number + '/' + self.selectedGrade.number + '_' + b.code + '_' + sem.term + '.pdf',
+                badgeClass: SEMESTER_STYLES[sem.term] || SEMESTER_STYLES[1]
+              });
+            });
+          });
+          if (this.activeFilter === 'all') return items;
+          return items.filter(function(item) { return item.code === self.activeFilter; });
+        },
+
+        // ─── Select a grade and switch to grade view ───
+        selectGrade: function(grade) {
+          this.selectedGrade = grade;
+          this.activeFilter = 'all';
+          this.currentView = 'grade';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        // ─── Go back to dashboard ───
+        goToDashboard: function() {
+          this.currentView = 'dashboard';
+          this.selectedGrade = null;
+          this.activeFilter = 'all';
+        },
+
+        // ─── Arabic numeral helper (exposed to template) ───
+        toArNum: function(n) {
+          return toArabicNumeral(n);
+        },
+
+        // ─── Internal: extract unique subjects from books array ───
+        _extractSubjects: function(books) {
+          var seen = {};
+          var result = [];
+          books.forEach(function(b) {
+            if (!seen[b.code]) {
+              seen[b.code] = true;
+              result.push({
+                key: b.code,
+                label: b.subject,
+                icon: b.icon,
+                coverGradient: b.coverGradient,
+                hoverClass: SUBJECT_HOVER[b.code] || 'hover:bg-slate-800/50 hover:border-slate-600 hover:text-slate-300'
+              });
+            }
+          });
+          return result;
+        }
+      };
+    }
   </script>
 
 </body>
