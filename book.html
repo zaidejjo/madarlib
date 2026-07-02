@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<!--
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║                📚  DYNAMIC GRADE BOOK TEMPLATE                            ║
+║                                                                           ║
+║  This page is dynamically driven by books.json and URL parameters.        ║
+║  Usage: book.html?grade=9                                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020617" id="metaTheme">
+  <meta name="description" content="" id="metaDesc">
+  <title id="pageTitle">مكتبة مدار</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: { 'xs': '420px' },
+          fontFamily: {
+            sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 7s ease-in-out infinite',
+            'float-delayed': 'float 7s ease-in-out 3.5s infinite',
+            'slide-up': 'slide-up 0.6s ease-out forwards',
+            'shimmer': 'shimmer 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-24px)' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #020617;
+      background-image:
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 55%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+    .glass-strong {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .book-card {
+      opacity: 1;
+      transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+    .book-card.hidden-card { display: none; }
+    .book-card:active { transform: scale(0.98); }
+    @media (hover: hover) { .book-card:hover { transform: translateY(-6px); } }
+    .book-cover { position: relative; overflow: hidden; }
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to top, rgba(0,0,0,0.45), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .filter-pill {
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-pill.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.5);
+      color: #22d3ee;
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
+    }
+    .filter-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+    .gradient-text {
+      background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text-accent {
+      background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-download {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 44px;
+    }
+    .btn-download::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.04) 40%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.04) 60%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+    }
+    .entrance-1  { animation: slide-up 0.5s ease-out 0.02s both; }
+    .entrance-2  { animation: slide-up 0.5s ease-out 0.05s both; }
+    .entrance-3  { animation: slide-up 0.5s ease-out 0.08s both; }
+    .entrance-4  { animation: slide-up 0.5s ease-out 0.11s both; }
+    .entrance-5  { animation: slide-up 0.5s ease-out 0.14s both; }
+    .entrance-6  { animation: slide-up 0.5s ease-out 0.17s both; }
+    .entrance-7  { animation: slide-up 0.5s ease-out 0.20s both; }
+    .entrance-8  { animation: slide-up 0.5s ease-out 0.23s both; }
+    .entrance-9  { animation: slide-up 0.5s ease-out 0.26s both; }
+    .entrance-10 { animation: slide-up 0.5s ease-out 0.29s both; }
+    .entrance-11 { animation: slide-up 0.5s ease-out 0.32s both; }
+    .entrance-12 { animation: slide-up 0.5s ease-out 0.35s both; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #22d3ee, #6366f1);
+      border-radius: 3px;
+    }
+    html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+    ::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+    .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .js-hidden { visibility: hidden; }
+
+    /* ══════════════════════════════════════════════════════════════
+       ACCENT THEME — CSS custom properties per grade (RGB values)
+       ══════════════════════════════════════════════════════════════ */
+    .accent-sky     { --a3: #7dd3fc; --a6r:   2,132,199; --a7r:   3,105,161; --a5r:  14,165,233; }
+    .accent-amber   { --a3: #fcd34d; --a6r: 217,119,  6; --a7r: 180, 83,  9; --a5r: 245,158, 11; }
+    .accent-teal    { --a3: #5eead4; --a6r:  13,148,136; --a7r:  15,118,110; --a5r:  20,184,166; }
+    .accent-pink    { --a3: #f9a8d4; --a6r: 219, 39,119; --a7r: 190, 24, 93; --a5r: 236, 72,153; }
+    .accent-orange  { --a3: #fdba74; --a6r: 234, 88, 12; --a7r: 194, 65, 12; --a5r: 249,115, 22; }
+    .accent-indigo  { --a3: #a5b4fc; --a6r:  79, 70,229; --a7r:  67, 56,202; --a5r:  99,102,241; }
+    .accent-cyan    { --a3: #67e8f9; --a6r:   8,145,178; --a7r:  14,116,144; --a5r:   6,182,212; }
+    .accent-blue    { --a3: #93c5fd; --a6r:  37, 99,235; --a7r:  29, 78,216; --a5r:  59,130,246; }
+    .accent-emerald { --a3: #6ee7b7; --a6r:   5,150,105; --a7r:   4,120, 87; --a5r:  16,185,129; }
+    .accent-violet  { --a3: #c4b5fd; --a6r: 124, 58,237; --a7r: 109, 40,217; --a5r: 139, 92,246; }
+    .accent-fuchsia { --a3: #f0abfc; --a6r: 192, 38,211; --a7r: 162, 28,175; --a5r: 217, 70,239; }
+
+    .btn-download-accent:hover {
+      background: linear-gradient(135deg, rgba(var(--a6r), 0.2), rgba(var(--a7r), 0.1)) !important;
+      border-color: rgba(var(--a5r), 0.3) !important;
+      color: var(--a3) !important;
+      box-shadow: 0 10px 15px -3px rgba(var(--a5r), 0.1) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-blue-500/8 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute -bottom-40 -right-40 w-80 sm:w-[30rem] h-80 sm:h-[30rem] bg-indigo-500/8 rounded-full blur-[120px] animate-float-delayed"></div>
+  </div>
+
+  <nav class="relative z-50 nav-safe">
+    <div class="glass-strong fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] sm:w-[calc(100%-2rem)] max-w-6xl rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl shadow-cyan-500/5">
+      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
+          <i class="fa-solid fa-book-open text-white text-sm sm:text-lg"></i>
+        </div>
+        <span class="text-white font-bold text-base sm:text-xl tracking-tight">مكتبة <span class="gradient-text">مدار</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">
+          <i class="fa-solid fa-house ml-1.5"></i>الرئيسية
+        </a>
+        <span id="navGradeLabel" class="text-cyan-300 text-sm font-medium">
+          <i class="fa-solid fa-book ml-1.5"></i><span id="navGradeText"></span>
+        </span>
+      </div>
+      <a href="index.html"
+         class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
+                text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
+                hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
+                transition-all duration-300 shrink-0">
+        <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+        العودة للصفوف
+      </a>
+      <button id="mobileMenuBtn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+  </nav>
+
+  <section class="relative z-10 pt-28 pb-6 sm:pt-36 sm:pb-8 md:pt-44 md:pb-10 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="hidden xs:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 entrance-1">
+        <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs text-slate-700"></i>
+        <span id="breadcrumbGrade" class="text-cyan-400"></span>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div class="entrance-2">
+          <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span id="headerBadge"></span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            كتب <span id="headerTitle" class="gradient-text-accent"></span>
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base mt-1.5 sm:mt-2">اختر المادة الدراسية ثم حمل الكتاب بنقرة واحدة</p>
+        </div>
+        <a href="index.html"
+           class="sm:hidden inline-flex items-center justify-center gap-2 w-full xs:w-auto px-5 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-700/60 active:scale-[0.98] transition-all duration-200 entrance-3 min-h-[44px]">
+          <i class="fa-solid fa-arrow-right"></i>
+          العودة للصفوف
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative z-10 px-4 pb-4 sm:pb-6 js-hidden" id="filterSection">
+    <div class="max-w-6xl mx-auto">
+      <div class="overflow-x-auto md:overflow-visible filter-scroll -mx-4 px-4 md:mx-0 md:px-0">
+        <div class="glass rounded-xl sm:rounded-2xl p-1.5 sm:p-2 inline-flex flex-nowrap md:flex-wrap items-center gap-1.5 sm:gap-2 min-w-max md:min-w-0" id="filterContainer">
+          <!-- Filters injected by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24 js-hidden" id="booksSection">
+    <div class="max-w-6xl mx-auto">
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+        <!-- Cards rendered by JS -->
+      </div>
+      <div id="emptyState" class="hidden text-center py-16 sm:py-20">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center mx-auto mb-5 sm:mb-6">
+          <i class="fa-solid fa-book-open text-slate-600 text-2xl sm:text-3xl"></i>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-300 mb-1.5 sm:mb-2">لا توجد كتب في هذا التصنيف</h3>
+        <p class="text-slate-500 text-sm">اختر تصنيفاً آخر لعرض الكتب المتاحة</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="relative z-10 border-t border-slate-800/60">
+    <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-2 text-slate-400 text-xs sm:text-sm">
+          <i class="fa-regular fa-copyright text-[10px] sm:text-sm"></i>
+          <span>جميع الحقوق محفوظة لمكتبة <span class="text-cyan-400 font-semibold">مدار</span> 2024</span>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500">
+          <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+          <span class="text-slate-700">|</span>
+          <span id="footerGrade" class="text-cyan-400"></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="mobileMenu" class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl hidden">
+    <div class="flex flex-col items-center justify-center h-full gap-8 px-6">
+      <button id="closeMobileMenu" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+      <a href="index.html" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</a>
+      <span id="mobileGradeLabel" class="text-2xl sm:text-3xl text-cyan-400 font-semibold"></span>
+      <div class="flex flex-wrap justify-center gap-2.5 mt-2 px-4" id="mobileFilterList">
+        <!-- Injected by JS -->
+      </div>
+      <div class="mt-2 h-px w-32 bg-slate-800"></div>
+      <a href="https://madarcore.onrender.com"
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+        <i class="fa-solid fa-arrow-right"></i>
+        الرجوع للموقع
+      </a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const semesterColors = {
+        1: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', shadow: 'shadow-emerald-500/5' },
+        2: { bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   text: 'text-amber-300',   shadow: 'shadow-amber-500/5' }
+      };
+
+      let currentGradeData = null;
+      let allBooksData = [];
+
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const gradeNum = params.get('grade');
+
+        if (!gradeNum || isNaN(gradeNum) || gradeNum < 1 || gradeNum > 12) {
+          showError('الصف غير موجود', 'الرجاء اختيار صف من 1 إلى 12');
+          return;
+        }
+
+        showSkeletons();
+
+        try {
+          const response = await fetch('books.json');
+          if (!response.ok) throw new Error('Network response was not ok');
+          const data = await response.json();
+          
+          const grade = data.grades.find(g => g.number == gradeNum);
+          if (!grade) {
+            showError('بيانات الصف غير متوفرة', 'نعتذر، لم يتم العثور على بيانات لهذا الصف في قاعدة البيانات');
+            return;
+          }
+
+          currentGradeData = grade;
+          allBooksData = grade.books;
+          
+          setupPageMetadata(grade);
+          setupVisuals(grade);
+          renderFilters();
+          renderBooks('all');
+          setupMobileMenu();
+          
+          document.getElementById('filterSection').classList.remove('js-hidden');
+          document.getElementById('booksSection').classList.remove('js-hidden');
+        } catch (error) {
+          console.error('Fetch error:', error);
+          showError('حدث خطأ أثناء تحميل البيانات', 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى');
+        }
+      }
+
+      function setupPageMetadata(grade) {
+        const name = grade.nameArabic;
+        document.title = `كتب الصف ${name} | مكتبة مدار`;
+        document.getElementById('metaDesc').content = `كتب الصف ${name} - مكتبة مدار الرقمية`;
+        document.getElementById('navGradeText').textContent = `الصف ${name}`;
+        document.getElementById('breadcrumbGrade').textContent = `الصف ${name}`;
+        document.getElementById('headerTitle').textContent = `الصف ${name}`;
+        document.getElementById('mobileGradeLabel').textContent = `الصف ${name}`;
+        document.getElementById('footerGrade').textContent = `الصف ${name}`;
+        
+        const bookCount = grade.books.reduce((acc, b) => acc + b.semesters.length, 0);
+        document.getElementById('headerBadge').textContent = `الصف ${name} - ${bookCount} كتب متاحة`;
+      }
+
+      function setupVisuals(grade) {
+        document.body.classList.add(`accent-${grade.accentColor}`);
+      }
+
+      function showSkeletons() {
+        const grid = document.getElementById('booksGrid');
+        grid.innerHTML = '';
+        for (let i = 0; i < 8; i++) {
+          grid.innerHTML += `
+            <div class="book-card rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900/50 border border-slate-800/50 flex flex-col animate-pulse">
+              <div class="h-36 sm:h-40 md:h-44 bg-slate-800 animate-shimmer"></div>
+              <div class="p-4 sm:p-5 flex flex-col flex-1 gap-4">
+                <div class="flex justify-between">
+                  <div class="h-3 w-16 bg-slate-800 rounded"></div>
+                  <div class="h-3 w-12 bg-slate-800 rounded-full"></div>
+                </div>
+                <div class="h-5 w-3/4 bg-slate-800 rounded"></div>
+                <div class="h-3 w-1/2 bg-slate-800 rounded mb-4"></div>
+                <div class="mt-auto h-11 w-full bg-slate-800 rounded-lg"></div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function renderFilters() {
+        const container = document.getElementById('filterContainer');
+        const subjects = [];
+        const seen = new Set();
+        
+        currentGradeData.books.forEach(b => {
+          if (!seen.has(b.code)) {
+            subjects.push(b);
+            seen.add(b.code);
+          }
+        });
+
+        let html = `
+          <button class="filter-pill active px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium 
+            bg-cyan-500/15 border border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5" 
+            data-filter="all" onclick="window.filterBooks('all')" type="button">
+            <i class="fa-solid fa-layer-group ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i> الكل
+          </button>
+        `;
+
+        subjects.forEach(s => {
+          html += `
+            <button class="filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium 
+              border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/30 hover:bg-cyan-500/5" 
+              data-filter="${s.code}" onclick="window.filterBooks('${s.code}')" type="button">
+              <i class="fa-solid ${s.icon} ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i> ${s.subject}
+            </button>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function renderBooks(filter) {
+        const grid = document.getElementById('booksGrid');
+        grid.innerHTML = '';
+        let visibleCount = 0;
+        let idx = 0;
+
+        currentGradeData.books.forEach(book => {
+          if (filter !== 'all' && book.code !== filter) return;
+
+          book.semesters.forEach(sem => {
+            idx++;
+            visibleCount++;
+            const sc = semesterColors[sem.term] || semesterColors[1];
+            const entranceCls = `entrance-${Math.min(idx, 12)}`;
+
+            const card = document.createElement('div');
+            card.className = `book-card rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800/50 shadow-lg shadow-slate-900/50 hover:shadow-xl flex flex-col ${entranceCls}`;
+            card.dataset.subject = book.code;
+            card.innerHTML = `
+              <div class="book-cover h-36 sm:h-40 md:h-44 bg-gradient-to-br ${book.coverGradient} flex items-center justify-center">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                  <i class="fa-solid ${book.icon} text-white/80 text-2xl sm:text-3xl"></i>
+                </div>
+              </div>
+              <div class="p-4 sm:p-5 flex flex-col flex-1">
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                  <span class="text-slate-400 text-[10px] sm:text-xs font-medium">${book.subject}</span>
+                  <span class="px-2 sm:px-2.5 py-0.5 rounded-full ${sc.bg} border ${sc.border} ${sc.text} text-[10px] sm:text-xs font-semibold shadow-sm ${sc.shadow}">
+                    <i class="fa-solid fa-star ml-1 text-[8px] sm:text-[10px]"></i> ${sem.label}
+                  </span>
+                </div>
+                <h3 class="text-white font-bold text-sm sm:text-base mb-0.5 sm:mb-1">${book.subject}</h3>
+                <p class="text-slate-500 text-[10px] sm:text-xs mb-3 sm:mb-4">للصف ${currentGradeData.nameArabic} - ${sem.label}</p>
+                <div class="mt-auto">
+                  <a download="${sem.url}" href="${sem.url}" target="_blank" 
+                     class="btn-download btn-download-accent group flex items-center justify-center gap-2 w-full px-3 sm:px-4 py-2.5 sm:py-3 
+                            rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold min-h-[44px] 
+                            bg-gradient-to-r from-slate-700/40 to-slate-800/30 
+                            border border-slate-600/30 text-slate-300 
+                            active:scale-[0.98] transition-all duration-300">
+                    <i class="fa-solid fa-download group-hover:-translate-y-0.5 transition-transform text-[10px] sm:text-xs"></i>
+                    <span>تحميل الكتاب</span>
+                  </a>
+                </div>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        });
+
+        document.getElementById('emptyState').classList.toggle('hidden', visibleCount > 0);
+      }
+
+      window.filterBooks = function(subjectKey) {
+        const pills = document.querySelectorAll('.filter-pill');
+        pills.forEach(pill => {
+          if (pill.dataset.filter === subjectKey) {
+            pill.classList.add('active', 'bg-cyan-500/15', 'border-cyan-500/50', 'text-cyan-300', 'shadow-lg', 'shadow-cyan-500/5');
+          } else {
+            pill.classList.remove('active', 'bg-cyan-500/15', 'border-cyan-500/50', 'text-cyan-300', 'shadow-lg', 'shadow-cyan-500/5');
+          }
+        });
+        renderBooks(subjectKey);
+      };
+
+      function setupMobileMenu() {
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeBtn = document.getElementById('closeMobileMenu');
+        const filterList = document.getElementById('mobileFilterList');
+
+        menuBtn.onclick = () => {
+          mobileMenu.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+        closeBtn.onclick = () => {
+          mobileMenu.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        const subjects = [];
+        const seen = new Set();
+        currentGradeData.books.forEach(b => {
+          if (!seen.has(b.code)) {
+            subjects.push(b);
+            seen.add(b.code);
+          }
+        });
+
+        let mfHTML = `<button class="px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks('all'); document.getElementById('mobileMenu').classList.add('hidden'); document.body.style.overflow='';">الكل</button>`;
+        subjects.forEach(s => {
+          mfHTML += `<button class="px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks('${s.code}'); document.getElementById('mobileMenu').classList.add('hidden'); document.body.style.overflow='';">
+            <i class="fa-solid ${s.icon} ml-1.5"></i> ${s.subject}
+          </button>`;
+        });
+        filterList.innerHTML = mfHTML;
+      }
+
+      function showError(title, message) {
+        const section = document.getElementById('booksSection');
+        section.innerHTML = `
+          <div class="max-w-6xl mx-auto flex items-center justify-center py-20">
+            <div class="glass-strong p-8 rounded-3xl text-center max-w-md border-red-500/20 shadow-2xl shadow-red-500/10">
+              <div class="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-circle-exclamation text-red-400 text-3xl"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-white mb-3">${title}</h3>
+              <p class="text-slate-400 mb-8 leading-relaxed">${message}</p>
+              <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200">
+                <i class="fa-solid fa-arrow-right"></i> العودة للرئيسية
+              </a>
+            </div>
+          </div>
+        `;
+        document.getElementById('filterSection').classList.add('hidden');
+        document.getElementById('booksSection').classList.remove('js-hidden');
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
