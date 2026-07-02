@@ -104,8 +104,8 @@
           "icon": "fa-book-quran",
           "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ar_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ar_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ar_2.pdf" }
           ]
         },
         {
@@ -114,8 +114,8 @@
           "icon": "fa-square-root-variable",
           "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_math_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_math_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_math_2.pdf" }
           ]
         },
         {
@@ -124,8 +124,8 @@
           "icon": "fa-language",
           "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_en_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_en_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_en_2.pdf" }
           ]
         },
         {
@@ -134,8 +134,8 @@
           "icon": "fa-flask",
           "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ch_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ch_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ch_2.pdf" }
           ]
         },
         {
@@ -144,8 +144,8 @@
           "icon": "fa-atom",
           "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ph_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ph_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ph_2.pdf" }
           ]
         }
       ]
@@ -166,8 +166,8 @@
           "icon": "fa-book-quran",
           "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ar_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ar_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ar_2.pdf" }
           ]
         },
         {
@@ -176,8 +176,8 @@
           "icon": "fa-square-root-variable",
           "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_math_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_math_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_math_2.pdf" }
           ]
         },
         {
@@ -186,8 +186,8 @@
           "icon": "fa-language",
           "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_en_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_en_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_en_2.pdf" }
           ]
         },
         {
@@ -196,8 +196,8 @@
           "icon": "fa-flask",
           "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ch_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ch_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ch_2.pdf" }
           ]
         },
         {
@@ -206,8 +206,8 @@
           "icon": "fa-atom",
           "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ph_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ph_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ph_2.pdf" }
           ]
         }
       ]
@@ -228,8 +228,8 @@
           "icon": "fa-book-quran",
           "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_ar_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_ar_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_ar_2.pdf" }
           ]
         },
         {
@@ -238,8 +238,8 @@
           "icon": "fa-square-root-variable",
           "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_math_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_math_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_2.pdf" }
           ]
         },
         {
@@ -248,8 +248,8 @@
           "icon": "fa-book",
           "coverGradient": "from-amber-600/40 via-amber-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_hist_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_hist_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_hist_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_hist_2.pdf" }
           ]
         },
         {
@@ -258,8 +258,8 @@
           "icon": "fa-book-quran",
           "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_islam_1.pdf" },
-            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_islam_2.pdf" }
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_islam_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_islam_2.pdf" }
           ]
         }
       ]
