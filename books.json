@@ -1,0 +1,279 @@
+{
+  "grades": [
+    {
+      "number": 1,
+      "nameArabic": "الأول",
+      "nameEnglish": "Grade 1",
+      "accentColor": "sky",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #082f49 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #38bdf8, #2563eb)",
+      "badgeClass": "bg-sky-500/10 border-sky-500/20 text-sky-300",
+      "arrowCSS": "#38bdf8",
+      "books": []
+    },
+    {
+      "number": 2,
+      "nameArabic": "الثاني",
+      "nameEnglish": "Grade 2",
+      "accentColor": "amber",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #451a03 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #fbbf24, #ea580c)",
+      "badgeClass": "bg-amber-500/10 border-amber-500/20 text-amber-300",
+      "arrowCSS": "#fbbf24",
+      "books": []
+    },
+    {
+      "number": 3,
+      "nameArabic": "الثالث",
+      "nameEnglish": "Grade 3",
+      "accentColor": "teal",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #2dd4bf, #059669)",
+      "badgeClass": "bg-teal-500/10 border-teal-500/20 text-teal-300",
+      "arrowCSS": "#2dd4bf",
+      "books": []
+    },
+    {
+      "number": 4,
+      "nameArabic": "الرابع",
+      "nameEnglish": "Grade 4",
+      "accentColor": "pink",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #500724 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #f472b6, #e11d48)",
+      "badgeClass": "bg-pink-500/10 border-pink-500/20 text-pink-300",
+      "arrowCSS": "#f472b6",
+      "books": []
+    },
+    {
+      "number": 5,
+      "nameArabic": "الخامس",
+      "nameEnglish": "Grade 5",
+      "accentColor": "orange",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #431407 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #fb923c, #dc2626)",
+      "badgeClass": "bg-orange-500/10 border-orange-500/20 text-orange-300",
+      "arrowCSS": "#fb923c",
+      "books": []
+    },
+    {
+      "number": 6,
+      "nameArabic": "السادس",
+      "nameEnglish": "Grade 6",
+      "accentColor": "indigo",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #818cf8, #7c3aed)",
+      "badgeClass": "bg-indigo-500/10 border-indigo-500/20 text-indigo-300",
+      "arrowCSS": "#818cf8",
+      "books": []
+    },
+    {
+      "number": 7,
+      "nameArabic": "السابع",
+      "nameEnglish": "Grade 7",
+      "accentColor": "cyan",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #083344 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #22d3ee, #2563eb)",
+      "badgeClass": "bg-cyan-500/10 border-cyan-500/20 text-cyan-300",
+      "arrowCSS": "#22d3ee",
+      "books": []
+    },
+    {
+      "number": 8,
+      "nameArabic": "الثامن",
+      "nameEnglish": "Grade 8",
+      "accentColor": "blue",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #172554 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #60a5fa, #4f46e5)",
+      "badgeClass": "bg-blue-500/10 border-blue-500/20 text-blue-300",
+      "arrowCSS": "#60a5fa",
+      "books": []
+    },
+    {
+      "number": 9,
+      "nameArabic": "التاسع",
+      "nameEnglish": "Grade 9",
+      "accentColor": "indigo",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #818cf8, #7c3aed)",
+      "badgeClass": "bg-indigo-500/10 border-indigo-500/20 text-indigo-300",
+      "arrowCSS": "#818cf8",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "اللغة الانجليزية",
+          "code": "en",
+          "icon": "fa-language",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_en_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الكيمياء",
+          "code": "ch",
+          "icon": "fa-flask",
+          "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ch_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الفيزياء",
+          "code": "ph",
+          "icon": "fa-atom",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/9_ph_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "nameArabic": "العاشر",
+      "nameEnglish": "Grade 10",
+      "accentColor": "emerald",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #022c22 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #34d399, #0d9488)",
+      "badgeClass": "bg-emerald-500/10 border-emerald-500/20 text-emerald-300",
+      "arrowCSS": "#34d399",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "اللغة الانجليزية",
+          "code": "en",
+          "icon": "fa-language",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_en_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الكيمياء",
+          "code": "ch",
+          "icon": "fa-flask",
+          "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ch_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الفيزياء",
+          "code": "ph",
+          "icon": "fa-atom",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/10_ph_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "nameArabic": "الحادي عشر",
+      "nameEnglish": "Grade 11",
+      "accentColor": "violet",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #2e1065 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #a78bfa, #7c3aed)",
+      "badgeClass": "bg-violet-500/10 border-violet-500/20 text-violet-300",
+      "arrowCSS": "#a78bfa",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "تاريخ الأردن",
+          "code": "hist",
+          "icon": "fa-book",
+          "coverGradient": "from-amber-600/40 via-amber-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_hist_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_hist_2.pdf" }
+          ]
+        },
+        {
+          "subject": "التربية الاسلامية",
+          "code": "islam",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_islam_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/books/releases/download/v1.0.0/11_islam_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "nameArabic": "الثاني عشر",
+      "nameEnglish": "Grade 12",
+      "accentColor": "fuchsia",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #4a044e 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #e879f9, #a21caf)",
+      "badgeClass": "bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-300",
+      "arrowCSS": "#e879f9",
+      "books": []
+    }
+  ]
+}
