@@ -371,6 +371,7 @@
   </div>
 
   <script>
+    // Helper for Arabic numerals
     function toArabicNumeral(n) {
       var digits = '٠١٢٣٤٥٦٧٨٩';
       return String(n).split('').map(function(c) {
@@ -385,24 +386,38 @@
         mobileMenuOpen: false,
 
         async init() {
+          console.log('Dashboard: Initializing...');
           try {
-            const response = await fetch('books.json');
-            if (!response.ok) throw new Error('Failed to fetch books.json');
+            // Add cache-buster to ensure fresh data
+            const response = await fetch('books.json?t=' + Date.now());
+            if (!response.ok) {
+              throw new Error('HTTP error! status: ' + response.status);
+            }
             const data = await response.json();
-            
-            // Enrich grades with bookCount for the badge
-            this.grades = data.grades.map(g => ({
-              ...g,
-              bookCount: g.books.reduce((acc, b) => acc + b.semesters.length, 0)
-            }));
+            console.log('Dashboard: Data loaded:', data);
+
+            if (data && Array.isArray(data.grades)) {
+              this.grades = data.grades.map(g => ({
+                ...g,
+                // Calculate book count safely
+                bookCount: g.books ? g.books.reduce((acc, b) => acc + b.semesters.length, 0) : 0
+              }));
+              console.log('Dashboard: Grades processed:', this.grades.length);
+            } else {
+              console.error('Dashboard: Invalid data structure. Expected "grades" array.');
+              this.grades = [];
+            }
           } catch (e) {
-            console.error('Error loading books data:', e);
+            console.error('Dashboard: Failed to load books.json:', e);
+            this.grades = []; // Ensure empty array on failure
           } finally {
             this.isLoading = false;
+            console.log('Dashboard: Loading state set to false.');
           }
         },
 
         selectGrade(grade) {
+          console.log('Dashboard: Navigating to grade', grade.number);
           window.location.href = `book.html?grade=${grade.number}`;
         },
 
