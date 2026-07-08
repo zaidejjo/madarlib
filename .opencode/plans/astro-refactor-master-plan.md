@@ -1104,6 +1104,103 @@ Each card is a dashboard tile with:
 
 ---
 
+## Phase 9: Shadcn Theme Migration — Light/Dark Mode, Smart Navigation, Clean Slate Palette
+
+### 9.1 — CSS Variables Theme Architecture
+
+Replace all neon/glow/purple with Shadcn's zinc/slate palette using CSS custom properties:
+
+```css
+:root {
+  --bg: #f4f4f5;          /* zinc-50 */
+  --surface: #ffffff;      /* white */
+  --surface-hover: #f4f4f5; /* zinc-50 */
+  --border: #e4e4e7;       /* zinc-200 */
+  --text: #18181b;          /* zinc-900 */
+  --text-muted: #71717a;    /* zinc-500 */
+  --text-subtle: #a1a1aa;   /* zinc-400 */
+  --accent: #18181b;        /* zinc-900 */
+  --accent-text: #fafafa;   /* zinc-50 */
+  --radius: 1rem;           /* consistent rounded-xl */
+}
+
+.dark {
+  --bg: #09090b;            /* zinc-950 */
+  --surface: #18181b;       /* zinc-900 */
+  --surface-hover: #27272a; /* zinc-800 */
+  --border: #27272a;        /* zinc-800 */
+  --text: #fafafa;          /* zinc-50 */
+  --text-muted: #a1a1aa;    /* zinc-400 */
+  --text-subtle: #52525b;   /* zinc-600 */
+  --accent: #fafafa;        /* zinc-50 */
+  --accent-text: #18181b;   /* zinc-900 */
+}
+```
+
+Key changes:
+- **Default dark mode**: `zinc-950` background (comfortable, not pitch black), `zinc-900` surfaces
+- **Light mode**: `zinc-50` background, white surfaces
+- **All borders**: clean `zinc-800` (dark) / `zinc-200` (light)
+- **All text**: `zinc-50` (dark) / `zinc-900` (light) with `zinc-400` muted
+- **No gradient backgrounds** on any card/surface
+- **No cyan/indigo/violet glow** anywhere
+
+### 9.2 — Theme Switcher (Sun/Moon Toggle)
+
+Inline `<script>` in `<head>` reads `localStorage` and system preference to set `.dark` class **before first paint** — zero flash:
+
+```
+┌─ Navbar ─────────────────────────────────────┐
+│  [📖 مكتبة مدار]    الرئيسية  الصفوف    [🌙] │
+└──────────────────────────────────────────────┘
+```
+
+- Sun icon visible in dark mode, Moon icon visible in light mode
+- Click toggles `.dark` class on `<html>` + saves to `localStorage`
+- Respects `prefers-color-scheme` on first visit
+
+### 9.3 — Smart Back-Button Navigation
+
+A back/home button in the navbar with routing logic:
+- **On `/` (homepage)**: redirects externally to `https://madarcore.onrender.com`
+- **On any internal page**: calls `window.history.back()` with fallback to `/`
+
+### 9.4 — Clean Corporate Hero (`index.astro`)
+
+Replace the overwhelming gradient headline with:
+- Small semantic badge (pill, surface bg, no neon)
+- Clean solid headline in `var(--text)` — no gradient text
+- Proportionally sized, spacious layout
+- CTA buttons: solid `zinc-900` fill (dark) / `zinc-50` fill (light) — no gradients
+- Stats as clean Shadcn metric cards: icon in surface bg, number in bold, label in muted
+
+### 9.5 — Clean Grade Cards (no loud dynamic gradients)
+
+- Solid card background using `var(--surface)`
+- No `::before` gradient border glow on hover
+- Simple hover: `translateY(-2px)` + `shadow-md`
+- Clean vertical stacking: book icon badge (top), Arabic name (bold), English name (muted), "N كتب" pill
+- Arrow indicator fades in on hover (no color, just neutral)
+
+### 9.6 — Files Changed
+
+| File | Change |
+|------|--------|
+| `.opencode/plans/astro-refactor-master-plan.md` | Append Phase 9 |
+| `astro/tailwind.config.mjs` | Add `darkMode: 'class'` |
+| `astro/src/styles/global.css` | CSS variables, themes, no neon |
+| `astro/src/layouts/BaseLayout.astro` | Theme toggle, back button, no orbs |
+| `astro/src/pages/index.astro` | Clean hero, shadcn stats |
+| `astro/src/components/GradeCard.astro` | Solid card, no gradient |
+| `astro/src/components/BookCard.astro` | Remove neon accents |
+| `astro/src/components/BookDetailBlock.astro` | Solid buttons, no gradients |
+| `astro/src/components/SearchBar.astro` | Zinc-toned search |
+| `astro/src/components/PdfPreviewModal.astro` | Themed modal |
+| `astro/src/pages/grade/[grade].astro` | Clean title |
+| `astro/src/pages/grade/[grade]/[bookCode].astro` | Clean hero card |
+
+---
+
 ## Implementation Sequence (Updated)
 
 | Step | Action | Risk | Commit Message |
@@ -1113,6 +1210,7 @@ Each card is a dashboard tile with:
 | 3 | Fix bugs | Medium | `fix: convert to bun, fix tailwind and searchbar` |
 | 4 | Add View Transitions, Prefetching, PDF Modal, Premium UX | Medium | `feat: add view transitions, prefetching, preview modal, premium ux` |
 | 5 | Premium visual overhaul — Cairo typography, Shadcn layouts, immersive pages | Medium | `style: complete premium visual overhaul with shadcn standards, gorgeous arabic typography, and high-fidelity layouts` |
+| 6 | Shadcn theme migration — light/dark mode, zinc palette, smart nav, clean cards | Medium | `style: migrate completely to authentic shadcn slate style with light/dark theme toggle and optimized layouts` |
 
 ---
 

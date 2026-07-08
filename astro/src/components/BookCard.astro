@@ -14,7 +14,8 @@ const { subject, code, icon, coverGradient, semesters, gradeNumber } = Astro.pro
 <a
   href={`/grade/${gradeNumber}/${code}`}
   data-astro-prefetch
-  class="book-card group block glass rounded-2xl overflow-hidden border border-slate-800/50"
+  class="book-card block rounded-2xl overflow-hidden border"
+  style="border-color: var(--border);"
 >
   <!-- Cover gradient area -->
   <div class={`h-28 sm:h-32 bg-gradient-to-br ${coverGradient} flex items-center justify-center relative overflow-hidden`}>
@@ -23,17 +24,15 @@ const { subject, code, icon, coverGradient, semesters, gradeNumber } = Astro.pro
   </div>
 
   <!-- Content -->
-  <div class="p-4 sm:p-5">
-    <h3 class="text-white text-sm sm:text-base font-bold mb-2.5 truncate">{subject}</h3>
+  <div class="p-4 sm:p-5" style="background-color: var(--surface);">
+    <h3 class="text-sm sm:text-base font-bold mb-2.5 truncate" style="color: var(--text);">{subject}</h3>
     <div class="flex flex-wrap gap-1.5">
       {semesters.map(sem => (
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-slate-800/80 text-slate-400 border border-slate-700/50">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border"
+              style="color: var(--text-muted); background-color: var(--surface-hover); border-color: var(--border);">
           {sem.label}
         </span>
       ))}
     </div>
   </div>
-
-  <!-- Hover accent bar -->
-  <div class="h-0.5 bg-gradient-to-r from-cyan-500 to-indigo-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-right"></div>
 </a>

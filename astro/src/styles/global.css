@@ -6,7 +6,35 @@
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════
-   GLOBAL RESET & BASE — Premium dark dashboard
+   SHADCN THEME — CSS Custom Properties (Zinc/Slate Palette)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #f4f4f5;
+  --surface: #ffffff;
+  --surface-hover: #f4f4f5;
+  --border: #e4e4e7;
+  --text: #18181b;
+  --text-muted: #71717a;
+  --text-subtle: #a1a1aa;
+  --accent: #18181b;
+  --accent-text: #fafafa;
+  --radius: 1rem;
+}
+
+.dark {
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface-hover: #27272a;
+  --border: #27272a;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-subtle: #52525b;
+  --accent: #fafafa;
+  --accent-text: #18181b;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL RESET & BASE
    ══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   margin: 0;
@@ -18,11 +46,12 @@ html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
   scrollbar-width: thin;
-  scrollbar-color: #22d3ee #020617;
+  scrollbar-color: var(--text-muted) transparent;
 }
 
 body {
-  background: #020617;
+  background-color: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   min-height: 100dvh;
   font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif;
@@ -31,26 +60,13 @@ body {
   line-height: 1.8;
   overflow-x: hidden;
   touch-action: manipulation;
-  color: #f1f5f9;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Subtle grid overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(30, 41, 59, 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 41, 59, 0.18) 1px, transparent 1px);
-  background-size: 64px 64px;
-  pointer-events: none;
-  z-index: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PREMIUM CAIRO TYPOGRAPHY
+   CAIRO TYPOGRAPHY
    ══════════════════════════════════════════════════════════════ */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
@@ -65,113 +81,92 @@ h4 { font-weight: 700; }
 p { line-height: 1.8; }
 
 /* ══════════════════════════════════════════════════════════════
-   GLASSMORPHISM UTILITIES
+   SHADCN SURFACE UTILITIES
    ══════════════════════════════════════════════════════════════ */
-.glass {
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.06);
+.surface {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
 }
 
-.glass-strong {
-  background: rgba(2, 6, 23, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+.surface-hover {
+  background-color: var(--surface-hover);
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GRADIENT TEXT
-   ══════════════════════════════════════════════════════════════ */
-.gradient-text {
-  background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   GRADE CARD — Luxury Dashboard Tile
+   GRADE CARD — Clean Shadcn Tile
    ══════════════════════════════════════════════════════════════ */
 .grade-card {
   position: relative;
   isolation: isolate;
-  min-height: 220px;
+  min-height: 200px;
   cursor: pointer;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   transition:
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 @media (min-width: 768px) {
-  .grade-card { min-height: 260px; }
+  .grade-card { min-height: 240px; }
 }
 
 .grade-card:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 @media (hover: hover) {
   .grade-card:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      0 12px 48px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(6, 182, 212, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
   }
 }
 
-/* Gradient border glow on hover */
-.grade-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, transparent 30%, rgba(6, 182, 212, 0.3), rgba(99, 102, 241, 0.3), transparent 70%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-@media (hover: hover) {
-  .grade-card:hover::before { opacity: 1; }
+.dark .grade-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BOOK CARD — Premium Media Tile
+   BOOK CARD — Clean Media Tile
    ══════════════════════════════════════════════════════════════ */
 .book-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   transition:
-    transform 0.3s ease-out,
-    box-shadow 0.3s ease-out,
-    border-color 0.3s ease-out;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 @media (hover: hover) {
   .book-card:hover {
-    transform: translateY(-4px);
-    box-shadow:
-      0 0 0 1px rgba(6, 182, 212, 0.18),
-      0 8px 32px rgba(6, 182, 212, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
 }
 
+.dark .book-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
 .book-card:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* ══════════════════════════════════════════════════════════════
    ENTRANCE ANIMATIONS
    ══════════════════════════════════════════════════════════════ */
+.entrance-1  { animation: slide-up 0.4s ease-out 0.05s both; }
+.entrance-2  { animation: slide-up 0.4s ease-out 0.10s both; }
+.entrance-3  { animation: slide-up 0.4s ease-out 0.16s both; }
+.entrance-4  { animation: slide-up 0.4s ease-out 0.22s both; }
+.entrance-5  { animation: slide-up 0.4s ease-out 0.28s both; }
+.entrance-6  { animation: slide-up 0.4s ease-out 0.34s both; }
+.entrance-7  { animation: slide-up 0.4s ease-out 0.40s both; }
+
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -179,16 +174,8 @@ p { line-height: 1.8; }
   }
 }
 
-.entrance-1  { animation: slide-up 0.5s ease-out 0.05s both; }
-.entrance-2  { animation: slide-up 0.5s ease-out 0.12s both; }
-.entrance-3  { animation: slide-up 0.5s ease-out 0.20s both; }
-.entrance-4  { animation: slide-up 0.5s ease-out 0.28s both; }
-.entrance-5  { animation: slide-up 0.5s ease-out 0.36s both; }
-.entrance-6  { animation: slide-up 0.5s ease-out 0.44s both; }
-.entrance-7  { animation: slide-up 0.5s ease-out 0.52s both; }
-
 /* ══════════════════════════════════════════════════════════════
-   ASTRO VIEW TRANSITIONS — Premium SPA fade
+   ASTRO VIEW TRANSITIONS — SPA fade
    ══════════════════════════════════════════════════════════════ */
 @keyframes vt-fade-out {
   to { opacity: 0; }
@@ -198,14 +185,14 @@ p { line-height: 1.8; }
 }
 
 html::view-transition-old(root) {
-  animation: vt-fade-out 220ms ease-out;
+  animation: vt-fade-out 200ms ease-out;
 }
 html::view-transition-new(root) {
-  animation: vt-fade-in 280ms ease-in;
+  animation: vt-fade-in 250ms ease-in;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PDF PREVIEW MODAL — Premium overlay
+   PDF PREVIEW MODAL
    ══════════════════════════════════════════════════════════════ */
 #pdf-preview-modal {
   transition: opacity 0.3s ease;
@@ -222,13 +209,11 @@ html::view-transition-new(root) {
 }
 
 #pdf-preview-modal #modal-panel {
-  transition:
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 #pdf-preview-modal.closed #modal-panel {
-  transform: scale(0.92);
+  transform: scale(0.95);
   opacity: 0;
 }
 
@@ -238,12 +223,12 @@ html::view-transition-new(root) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CUSTOM SCROLLBAR — Thin gradient
+   CUSTOM SCROLLBAR
    ══════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #22d3ee, #6366f1);
+  background: var(--text-subtle);
   border-radius: 2px;
 }
 
@@ -251,8 +236,8 @@ html::view-transition-new(root) {
    SELECTION
    ══════════════════════════════════════════════════════════════ */
 ::selection {
-  background: rgba(6, 182, 212, 0.35);
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
 }
 
 /* ══════════════════════════════════════════════════════════════

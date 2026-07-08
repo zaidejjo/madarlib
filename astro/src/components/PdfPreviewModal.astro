@@ -1,30 +1,31 @@
 <!--
-  PdfPreviewModal — Premium PDF preview via Google Docs Viewer.
-  Triggered by the custom "open-preview" event with { url } in detail.
-  Vanilla JS — handles open, close, escape, backdrop.
+  PdfPreviewModal — PDF preview via Google Docs Viewer.
+  Triggered by custom "open-preview" event with { url } in detail.
+  Themed with CSS variables for light/dark consistency.
 -->
 <div
   id="pdf-preview-modal"
   class="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 closed"
 >
   <!-- Backdrop -->
-  <div id="modal-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-xl"></div>
+  <div id="modal-backdrop" class="absolute inset-0" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);"></div>
 
   <!-- Panel -->
   <div
     id="modal-panel"
-    class="relative w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border border-slate-700/40 shadow-2xl overflow-hidden"
-    style="background: rgba(2, 6, 23, 0.96); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);"
+    class="relative w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border shadow-2xl overflow-hidden"
+    style="background-color: var(--surface); border-color: var(--border);"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-800/80 shrink-0">
-      <h3 class="text-white font-bold text-sm flex items-center gap-2.5">
-        <i class="fa-solid fa-book-open text-cyan-400"></i>
+    <div class="flex items-center justify-between px-5 py-3.5 border-b shrink-0" style="border-color: var(--border);">
+      <h3 class="font-bold text-sm flex items-center gap-2.5" style="color: var(--text);">
+        <i class="fa-solid fa-book-open" style="color: var(--text-muted);"></i>
         معاينة الكتاب
       </h3>
       <button
         id="modal-close"
-        class="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+        class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+        style="background-color: var(--surface-hover); color: var(--text-muted);"
         aria-label="إغلاق"
       >
         <i class="fa-solid fa-xmark"></i>
@@ -42,17 +43,17 @@
         title="معاينة الكتاب"
       ></iframe>
       <!-- Loading placeholder -->
-      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center" style="background: rgba(2, 6, 23, 0.85);">
+      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center" style="background-color: var(--surface);">
         <div class="text-center">
-          <i class="fa-solid fa-spinner text-cyan-400 text-3xl animate-spin mb-3"></i>
-          <p class="text-slate-400 text-sm font-medium">جاري تحميل المعاينة...</p>
+          <i class="fa-solid fa-spinner text-3xl animate-spin mb-3" style="color: var(--text-muted);"></i>
+          <p class="text-sm font-medium" style="color: var(--text-muted);">جاري تحميل المعاينة...</p>
         </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between px-5 py-3 border-t border-slate-800/80 shrink-0">
-      <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+    <div class="flex items-center justify-between px-5 py-3 border-t shrink-0" style="border-color: var(--border);">
+      <div class="flex items-center gap-2 text-xs font-medium" style="color: var(--text-subtle);">
         <i class="fa-regular fa-clock"></i>
         يتم التحميل من مستندات جوجل
       </div>
@@ -62,7 +63,10 @@
           href="#"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border border-slate-700/60 text-slate-300 hover:border-cyan-500/30 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.97] transition-all duration-200"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200 active:scale-[0.97]"
+          style="border-color: var(--border); color: var(--text);"
+          onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+          onmouseout="this.style.backgroundColor='transparent'"
         >
           <i class="fa-solid fa-external-link-alt text-xs"></i>
           فتح في علامة تبويب
@@ -99,7 +103,7 @@
       iframe.onload = function () {
         if (loading) loading.style.display = 'none';
       };
-      // Timeout fallback — hide loading after 8s even if load event didn't fire
+      // Timeout fallback — hide loading after 8s
       setTimeout(function () {
         if (loading) loading.style.display = 'none';
       }, 8000);

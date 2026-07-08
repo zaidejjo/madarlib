@@ -1,8 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./src/**/*.{astro,html,js,jsx,ts,tsx}'],
   safelist: [
-    // Accent color classes for grade cards (dynamically set from JSON)
+    // Accent color classes for grade card badges (dynamically set from JSON)
     'text-sky-300', 'bg-sky-500/10', 'border-sky-500/20',
     'text-amber-300', 'bg-amber-500/10', 'border-amber-500/20',
     'text-teal-300', 'bg-teal-500/10', 'border-teal-500/20',
@@ -30,23 +31,12 @@ export default {
         sans: ['"Cairo"', '"Segoe UI"', 'system-ui', 'sans-serif'],
       },
       animation: {
-        float: 'float 7s ease-in-out infinite',
-        'float-delayed': 'float 7s ease-in-out 3.5s infinite',
-        'slide-up': 'slide-up 0.7s ease-out forwards',
-        shimmer: 'shimmer 3s linear infinite',
+        'slide-up': 'slide-up 0.5s ease-out forwards',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-24px)' },
-        },
         'slide-up': {
-          '0%': { opacity: '0', transform: 'translateY(36px)' },
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
         },
       },
     },
