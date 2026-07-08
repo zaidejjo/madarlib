@@ -1,0 +1,27 @@
+# MadarLib - المكتبة الرقمية للكتب المدرسية
+# https://madarlib.pages.dev/
+
+## Overview
+MadarLib is a digital library for Arabic school textbooks (Grades 1–12).
+It provides free PDF downloads of Student Books (كتاب الطالب) and Activity Books (كتاب التمارين)
+for both semesters.
+
+## Site Structure
+- / — Browse all 12 grades in a grid layout
+- /grade/{number} — View all subjects available for that grade
+- /grade/{number}/{subject-code} — Download page for a specific subject
+
+## Subject Codes
+- ar: اللغة العربية (Arabic Language)
+- math: الرياضيات (Mathematics)
+- en: اللغة الانجليزية (English Language)
+- ch: الكيمياء (Chemistry)
+- ph: الفيزياء (Physics)
+- hist: تاريخ الأردن (Jordan History)
+- islam: التربية الاسلامية (Islamic Education)
+
+## Grades Available
+1 (الأول) through 12 (الثاني عشر)
+
+## Data Source
+books.json at the project root contains all grade, subject, and book metadata including download URLs.

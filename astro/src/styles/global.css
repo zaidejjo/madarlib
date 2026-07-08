@@ -1,0 +1,179 @@
+/* ══════════════════════════════════════════════════════════════
+   Tailwind CSS v4 — Global Styles
+   ══════════════════════════════════════════════════════════════ */
+@import "tailwindcss";
+
+/* ── Theme Extensions ── */
+@theme {
+  --font-sans: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-delayed: float 7s ease-in-out 3.5s infinite;
+  --animate-slide-up: slide-up 0.7s ease-out forwards;
+  --animate-shimmer: shimmer 3s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-24px); }
+  }
+
+  @keyframes slide-up {
+    0% { opacity: 0; transform: translateY(36px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
+
+/* ── Screens ── */
+@custom-media --xs (min-width: 420px);
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL RESET & BASE
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #020617;
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(6, 182, 212, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(99, 102, 241, 0.05) 0%, transparent 55%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  color: white;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLASSMORPHISM UTILITIES
+   ══════════════════════════════════════════════════════════════ */
+.glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.glass-strong {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRADIENT TEXT
+   ══════════════════════════════════════════════════════════════ */
+.gradient-text {
+  background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRADE CARD
+   ══════════════════════════════════════════════════════════════ */
+.grade-card {
+  position: relative;
+  isolation: isolate;
+  min-height: 220px;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .grade-card { min-height: 260px; }
+}
+
+.grade-card:active { transform: scale(0.97); }
+
+@media (hover: hover) {
+  .grade-card:hover {
+    transform: translateY(-6px) scale(1.02);
+  }
+}
+
+.grade-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 35%, rgba(6, 182, 212, 0.25), transparent 65%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .grade-card:hover::before { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ENTRANCE ANIMATIONS
+   ══════════════════════════════════════════════════════════════ */
+.entrance-1  { animation: slide-up 0.6s ease-out 0.05s both; }
+.entrance-2  { animation: slide-up 0.6s ease-out 0.12s both; }
+.entrance-3  { animation: slide-up 0.6s ease-out 0.20s both; }
+.entrance-4  { animation: slide-up 0.6s ease-out 0.28s both; }
+.entrance-5  { animation: slide-up 0.6s ease-out 0.36s both; }
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM SCROLLBAR
+   ══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22d3ee, #6366f1);
+  border-radius: 3px;
+}
+
+html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+
+/* ══════════════════════════════════════════════════════════════
+   SELECTION
+   ══════════════════════════════════════════════════════════════ */
+::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+
+/* ══════════════════════════════════════════════════════════════
+   SAFE AREA
+   ══════════════════════════════════════════════════════════════ */
+.nav-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+/* ══════════════════════════════════════════════════════════════
+   HIDE UNTIL JS LOADS (prevents FOUC)
+   ══════════════════════════════════════════════════════════════ */
+.js-hidden { display: none !important; }
