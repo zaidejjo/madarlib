@@ -23,16 +23,60 @@ const isHome = Astro.url.pathname === '/';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
 
-    <!-- FOWT Prevention — inline BEFORE first paint -->
+    <!-- Theme: FOUC prevention + View Transition persistence -->
     <script is:inline>
       (function() {
-        try {
-          var saved = localStorage.getItem('theme');
-          var prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (saved === 'dark' || (!saved && prefers)) {
-            document.documentElement.classList.add('dark');
+        // ── Apply theme class based on localStorage or system preference ──
+        function applyTheme() {
+          try {
+            var saved = localStorage.getItem('theme');
+            var prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefers)) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          } catch(e) {}
+        }
+
+        // Run immediately — prevents FOUC on initial paint
+        applyTheme();
+
+        // Re-apply after each Astro View Transition DOM swap.
+        // The <html> classList gets reset during the swap, so this
+        // ensures the user's preference is restored right after.
+        document.addEventListener('astro:after-swap', applyTheme);
+
+        // ── Re-attach event listeners after every page load ──
+        // Astro replaces <body> on navigation, so all DOM node references
+        // from the previous page become stale. We must re-bind to the
+        // fresh elements after each transition.
+        document.addEventListener('astro:page-load', function() {
+          // Theme toggle button
+          var toggle = document.getElementById('theme-toggle');
+          if (toggle) {
+            // Remove any stale listener via clone trick isn't needed—
+            // the button element is brand new after a swap.
+            toggle.addEventListener('click', function() {
+              var html = document.documentElement;
+              var isDark = html.classList.toggle('dark');
+              try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
+            });
           }
-        } catch(e) {}
+
+          // Smart back button
+          var backBtn = document.getElementById('back-btn');
+          if (backBtn && backBtn.dataset.isHome !== 'true') {
+            backBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                window.location.href = '/';
+              }
+            });
+          }
+        });
       })();
     </script>
 
@@ -131,32 +175,6 @@ const isHome = Astro.url.pathname === '/';
       </div>
     </footer>
 
-    <!-- Shared Script — Theme Toggle + Smart Back Button -->
-    <script is:inline>
-      (function() {
-        // ── Theme Toggle ──
-        var toggle = document.getElementById('theme-toggle');
-        if (toggle) {
-          toggle.addEventListener('click', function() {
-            var html = document.documentElement;
-            var isDark = html.classList.toggle('dark');
-            try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
-          });
-        }
-
-        // ── Smart Back Button ──
-        var backBtn = document.getElementById('back-btn');
-        if (backBtn && backBtn.dataset.isHome !== 'true') {
-          backBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              window.location.href = '/';
-            }
-          });
-        }
-      })();
-    </script>
+    <!-- Theme + Navigation scripts live in <head> via astro:page-load -->
   </body>
 </html>
