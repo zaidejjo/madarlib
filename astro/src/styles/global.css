@@ -148,6 +148,76 @@ html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
 .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
 
 /* ══════════════════════════════════════════════════════════════
+   ASTRO VIEW TRANSITIONS — Premium SPA fade navigation
+   ══════════════════════════════════════════════════════════════ */
+@keyframes vt-fade-out {
+  to { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+}
+
+html::view-transition-old(root) {
+  animation: vt-fade-out 250ms ease-out;
+}
+html::view-transition-new(root) {
+  animation: vt-fade-in 300ms ease-in;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PDF PREVIEW MODAL
+   ══════════════════════════════════════════════════════════════ */
+#pdf-preview-modal {
+  transition: opacity 0.3s ease;
+}
+
+#pdf-preview-modal.closed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#pdf-preview-modal:not(.closed) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#pdf-preview-modal #modal-panel {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+#pdf-preview-modal.closed #modal-panel {
+  transform: scale(0.92);
+  opacity: 0;
+}
+
+#pdf-preview-modal:not(.closed) #modal-panel {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PREMIUM CARD REFINEMENTS (Shadcn/Radix-level polish)
+   ══════════════════════════════════════════════════════════════ */
+
+/* BookCard hover lift + glow */
+a[data-astro-prefetch]:not(.grade-card):hover {
+  box-shadow:
+    0 0 0 1px rgba(6, 182, 212, 0.15),
+    0 8px 32px rgba(6, 182, 212, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar — thinner, gradient match */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22d3ee, #6366f1);
+  border-radius: 2px;
+}
+
+html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+
+/* ══════════════════════════════════════════════════════════════
    HIDE UNTIL JS LOADS (prevents FOUC)
    ══════════════════════════════════════════════════════════════ */
 .js-hidden { display: none !important; }

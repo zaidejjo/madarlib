@@ -7,4 +7,8 @@ export default defineConfig({
   site: 'https://madarlib.pages.dev/',
   integrations: [sitemap()],
   output: 'static',
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: 'hover',
+  },
 });

@@ -65,16 +65,14 @@ const colors = accentMap[accentColor] || accentMap.cyan;
 
       <!-- Dual-action buttons -->
       <div class="flex flex-col xs:flex-row gap-2">
-        <!-- Open / View -->
-        <a
-          href={data.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 border ${colors.outline}`}
+        <!-- Open / View (preview modal via custom event) -->
+        <button
+          data-preview-url={data.url}
+          class={`preview-btn flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 border cursor-pointer ${colors.outline}`}
         >
           <i class="fa-solid fa-eye"></i>
           <span>فتح الكتاب</span>
-        </a>
+        </button>
 
         <!-- Download -->
         <a
@@ -94,3 +92,18 @@ const colors = accentMap[accentColor] || accentMap.cyan;
     </div>
   )}
 </div>
+
+<script>
+  // Wire up preview buttons to dispatch the open-preview event
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.preview-btn');
+    if (!btn) return;
+    var url = btn.getAttribute('data-preview-url');
+    if (url) {
+      e.preventDefault();
+      document.dispatchEvent(
+        new CustomEvent('open-preview', { detail: { url: url } })
+      );
+    }
+  });
+</script>

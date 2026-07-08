@@ -871,19 +871,129 @@ See Phase 2.6 above — all accent colors and cover gradients are safelisted.
 
 ---
 
-## Implementation Sequence (Recommended Build Order)
+---
+
+## Phase 7: Premium UX & Fluid SPA Refinements
+
+### 7.1 — Astro View Transitions (SPA Navigation)
+
+Enable Astro's native `<ViewTransitions />` in `BaseLayout.astro` to orchestrate fluid page transitions across all routes:
+
+```astro
+---
+import { ViewTransitions } from 'astro:transitions';
+---
+<head>
+  <ViewTransitions />
+</head>
+```
+
+This enables the browser's native View Transition API — navigation between pages becomes a smooth fade animation instead of a hard refresh. Zero JavaScript overhead; the browser handles the morphing.
+
+**Custom transition styles** (in `global.css`):
+```css
+/* Fade transition for all navigations */
+html::view-transition-old(root),
+html::view-transition-new(root) {
+  animation-duration: 300ms;
+}
+```
+
+### 7.2 — Astro Prefetching (Zero-Lag Navigation)
+
+Add `data-astro-prefetch` on all navigable cards and links. Astro ships a built-in prefetch service (no extra package needed):
+
+- `GradeCard.astro`: `<a href="/grade/{n}" data-astro-prefetch>`
+- `BookCard.astro`: `<a href="/grade/{n}/{code}" data-astro-prefetch>`
+- Breadcrumb and back links on detail pages
+
+Prefetch behavior: when the user hovers over a link, the next page's HTML is fetched in the background. By the time they click, the content is already in the browser cache — zero perceived load time.
+
+**Configuration** (in `astro.config.mjs`):
+```js
+prefetch: {
+  prefetchAll: true,
+  defaultStrategy: 'hover',
+},
+```
+
+### 7.3 — PDF Preview Modal (GitHub Content-Disposition Bypass)
+
+**Problem:** GitHub Releases serve PDFs with `Content-Disposition: attachment`, forcing downloads even with `target="_blank"`.
+
+**Solution:** A premium inline modal using **Google Docs Viewer** to render the PDF inside an iframe:
+
+```
+https://docs.google.com/gview?url={PDF_URL}&embedded=true
+```
+
+Google's viewer ignores the `Content-Disposition` header and renders the PDF inline — users can scroll, zoom, and read without leaving the site.
+
+**Component: `PdfPreviewModal.astro`**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  (glass backdrop, covers entire viewport)                    │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  [Close X]  📖 معاينة الكتاب                            │ │
+│  │                                                         │ │
+│  │  ┌───────────────────────────────────────────────────┐  │ │
+│  │  │                                                   │  │ │
+│  │  │   Google Docs Viewer iframe                       │  │ │
+│  │  │   (100% width, 90vh height)                       │  │ │
+│  │  │                                                   │  │ │
+│  │  └───────────────────────────────────────────────────┘  │ │
+│  │                                                         │ │
+│  │  [فتح في علامة تبويب جديدة]  [تنزيل الكتاب]               │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Features:**
+- Opens when user clicks "فتح الكتاب" on any BookDetailBlock
+- Glass backdrop with `backdrop-blur-xl`
+- Centered glass panel with entrance scale animation
+- Close on: X button, Escape key, backdrop click
+- Footer buttons: open in new tab (falls back) + download
+- Responsive: full-width on mobile, max-w-5xl on desktop
+
+**BookDetailBlock changes:**
+- Replace the direct `<a href={url} target="_blank">` with a `<button>` that dispatches a custom event
+- The parent `[bookCode].astro` listens for the event and opens the modal with the appropriate PDF URL
+
+### 7.4 — Premium Shadcn/Radix-Style UI Refinements
+
+| Element | Enhancement |
+|---------|-------------|
+| Cards | Add `backdrop-blur-md`, tighter border with `border-white/5`, hover `shadow-2xl` with accent glow |
+| Buttons | Smoother `active:scale-[0.98]`, `transition-all duration-200`, accent border glow on focus |
+| Modal | Glass panel with `backdrop-filter: blur(32px)`, border gradient, scale entrance animation |
+| Scrollbar | Match the existing cyan/indigo gradient but thinner (4px) |
+| Micro-interactions | Button press scale, card lift on hover, instant backdrop blur |
+
+### 7.5 — Files Changed for This Phase
+
+| File | Change |
+|------|--------|
+| `astro/astro.config.mjs` | Add `prefetch` config |
+| `astro/src/layouts/BaseLayout.astro` | Add `<ViewTransitions />`, transition styles |
+| `astro/src/components/GradeCard.astro` | Add `data-astro-prefetch` |
+| `astro/src/components/BookCard.astro` | Add `data-astro-prefetch` |
+| `astro/src/components/BookDetailBlock.astro` | Replace direct link with modal-triggering button |
+| `astro/src/components/PdfPreviewModal.astro` | **NEW** — premium PDF preview modal |
+| `astro/src/pages/grade/[grade]/[bookCode].astro` | Integrate modal, wire events |
+| `astro/src/styles/global.css` | Transition animations, premium refinements |
+
+---
+
+## Implementation Sequence (Updated)
 
 | Step | Action | Risk | Commit Message |
 |------|--------|------|----------------|
-| 1 | **Initialize `/astro` project** — `bun create astro`, `bun add astro @astrojs/sitemap tailwindcss@3 postcss autoprefixer`, configure configs | Low | `feat: scaffold astro project with tailwind and sitemap` |
-| 2 | **Create copy script + package.json scripts** for cross-platform `books.json` copy | Low | `feat: add prebuild script for books.json copy` |
-| 3 | **Create `BaseLayout.astro`** with SEO props, OpenGraph, global styles, navbar, footer, orbs | Medium | `feat: implement base layout with seo and global styles` |
-| 4 | **Create `index.astro`** — hero + grade grid | Medium | `feat: create homepage with grade grid` |
-| 5 | **Create `[grade].astro`** — grade page with book cards | Medium | `feat: implement dynamic grade page with getStaticPaths` |
-| 6 | **Create `[bookCode].astro`** — book detail with dual-action buttons | Medium | `feat: implement book detail page with dual download buttons` |
-| 7 | **Create `SearchBar.astro`** — client-side search index | Medium | `feat: add global search bar with client-side filtering` |
-| 8 | **Provision `llm.txt`** in `/astro/public/` | Low | `feat: add llm.txt for LLM crawlers` |
-| 9 | **Build & verify** — `npm run build`, check all routes, sitemap, search | Low | `chore: verify build output` |
+| 1 | **Scaffold Astro project** with bun, Tailwind v3, PostCSS | Low | `feat: scaffold astro project with tailwind and sitemap` |
+| 2 | **Build all pages** (home, grades, book details) + components + search | Medium | `feat: implement all pages, routing, components, and search` |
+| 3 | **Fix bugs** — bun, Tailwind, SearchBar JSON.parse | Medium | `fix: convert to bun, fix tailwind and searchbar` |
+| 4 | **Add View Transitions, Prefetching, PDF Preview Modal, Premium UI** | Medium | `feat: add view transitions, prefetching, preview modal, premium ux` |
 
 ---
 

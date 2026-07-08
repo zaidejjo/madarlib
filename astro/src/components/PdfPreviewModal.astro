@@ -1,0 +1,135 @@
+<!--
+  PdfPreviewModal — Premium PDF preview via Google Docs Viewer.
+  Triggered by the custom "open-preview" event with { url } in detail.
+  Vanilla JS, no framework needed — handles open, close, escape, backdrop.
+-->
+<div
+  id="pdf-preview-modal"
+  class="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 closed"
+>
+  <!-- Backdrop -->
+  <div id="modal-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-xl"></div>
+
+  <!-- Panel -->
+  <div
+    id="modal-panel"
+    class="relative w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border border-slate-700/40 shadow-2xl overflow-hidden"
+    style="background: rgba(12, 20, 35, 0.96); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 shrink-0">
+      <h3 class="text-white font-bold text-sm flex items-center gap-2">
+        <i class="fa-solid fa-book-open text-cyan-400"></i>
+        معاينة الكتاب
+      </h3>
+      <button
+        id="modal-close"
+        class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90"
+        aria-label="إغلاق"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Viewer -->
+    <div class="flex-1 relative min-h-0">
+      <iframe
+        id="preview-iframe"
+        src=""
+        class="absolute inset-0 w-full h-full"
+        frameborder="0"
+        allowfullscreen
+        title="معاينة الكتاب"
+      ></iframe>
+      <!-- Loading placeholder -->
+      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center bg-slate-900/80">
+        <div class="text-center">
+          <i class="fa-solid fa-spinner text-cyan-400 text-3xl animate-spin mb-3"></i>
+          <p class="text-slate-400 text-sm">جاري تحميل المعاينة...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-800/80 shrink-0">
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <i class="fa-regular fa-clock"></i>
+        يتم التحميل من مستندات جوجل
+      </div>
+      <div class="flex items-center gap-2">
+        <a
+          id="modal-open-tab"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 text-slate-300 hover:border-cyan-500/30 hover:text-cyan-300 transition-all duration-200"
+        >
+          <i class="fa-solid fa-external-link-alt"></i>
+          فتح في علامة تبويب
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var modal = document.getElementById('pdf-preview-modal');
+    if (!modal) return;
+
+    var panel = document.getElementById('modal-panel');
+    var backdrop = document.getElementById('modal-backdrop');
+    var closeBtn = document.getElementById('modal-close');
+    var iframe = document.getElementById('preview-iframe');
+    var openTabLink = document.getElementById('modal-open-tab');
+    var loading = document.getElementById('modal-loading');
+
+    function openModal(url) {
+      var viewerUrl =
+        'https://docs.google.com/gview?url=' +
+        encodeURIComponent(url) +
+        '&embedded=true';
+      iframe.src = viewerUrl;
+      openTabLink.href = url;
+
+      // Show loading
+      if (loading) loading.style.display = 'flex';
+
+      // Clean up previous iframe load listener
+      iframe.onload = function () {
+        if (loading) loading.style.display = 'none';
+      };
+      // Timeout fallback — hide loading after 8s even if load event didn't fire
+      setTimeout(function () {
+        if (loading) loading.style.display = 'none';
+      }, 8000);
+
+      modal.classList.remove('closed');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('closed');
+      document.body.style.overflow = '';
+      // Clear iframe after transition to stop the render
+      setTimeout(function () {
+        iframe.src = '';
+        if (loading) loading.style.display = 'flex';
+      }, 300);
+    }
+
+    // Listen for the custom event
+    document.addEventListener('open-preview', function (e) {
+      if (e.detail && e.detail.url) {
+        openModal(e.detail.url);
+      }
+    });
+
+    // Close handlers
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  })();
+</script>

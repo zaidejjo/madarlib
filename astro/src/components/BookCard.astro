@@ -13,6 +13,7 @@ const { subject, code, icon, coverGradient, semesters, gradeNumber } = Astro.pro
 
 <a
   href={`/grade/${gradeNumber}/${code}`}
+  data-astro-prefetch
   class="group block glass rounded-2xl overflow-hidden border border-slate-800/60 hover:border-cyan-500/20 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5"
 >
   <!-- Cover gradient area -->

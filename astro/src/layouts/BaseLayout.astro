@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 
 export interface Props {
   title: string;
@@ -20,6 +21,9 @@ const ogImage = image || `${site}/logo.webp`;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#020617" />
+
+    <!-- ClientRouter — enables SPA view transitions (replaces deprecated ViewTransitions) -->
+    <ClientRouter fallback="swap" />
 
     <!-- Primary Meta -->
     <title>{title}</title>

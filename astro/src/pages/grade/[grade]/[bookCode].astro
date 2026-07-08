@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import BookDetailBlock from '../../../components/BookDetailBlock.astro';
+import PdfPreviewModal from '../../../components/PdfPreviewModal.astro';
 
 export async function getStaticPaths() {
   const { grades } = await import('../../../data/books.json');
@@ -30,9 +31,9 @@ const semesterCount = book.semesters?.length || 0;
     <div class="max-w-4xl mx-auto">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-6 entrance-1">
-        <a href="/" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+        <a href="/" data-astro-prefetch class="hover:text-cyan-400 transition-colors">الرئيسية</a>
         <i class="fa-solid fa-chevron-left text-[10px]"></i>
-        <a href={`/grade/${grade.number}`} class="hover:text-cyan-400 transition-colors">الصف {grade.nameArabic}</a>
+        <a href={`/grade/${grade.number}`} data-astro-prefetch class="hover:text-cyan-400 transition-colors">الصف {grade.nameArabic}</a>
         <i class="fa-solid fa-chevron-left text-[10px]"></i>
         <span class="text-white">{book.subject}</span>
       </div>
@@ -106,6 +107,7 @@ const semesterCount = book.semesters?.length || 0;
     <div class="max-w-4xl mx-auto text-center">
       <a
         href={`/grade/${grade.number}`}
+        data-astro-prefetch
         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 border border-slate-700 hover:border-cyan-500/30 hover:text-cyan-300 transition-all duration-300"
       >
         <i class="fa-solid fa-arrow-right"></i>
@@ -113,4 +115,7 @@ const semesterCount = book.semesters?.length || 0;
       </a>
     </div>
   </section>
+
+  <!-- PDF Preview Modal (rendered on this page, triggered via custom event) -->
+  <PdfPreviewModal />
 </BaseLayout>
