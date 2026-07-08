@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BookDetailBlock from '../../../components/BookDetailBlock.astro';
+
+export async function getStaticPaths() {
+  const { grades } = await import('../../../data/books.json');
+  const paths = [];
+  for (const grade of grades) {
+    for (const book of grade.books || []) {
+      paths.push({
+        params: { grade: String(grade.number), bookCode: book.code },
+        props: { grade, book },
+      });
+    }
+  }
+  return paths;
+}
+
+const { grade, book } = Astro.props;
+const accentColor = grade.accentColor || 'cyan';
+const semesterCount = book.semesters?.length || 0;
+---
+
+<BaseLayout
+  title={`مكتبة مدار | ${book.subject} — الصف ${grade.nameArabic}`}
+  description={`تحميل كتاب ${book.subject} للصف ${grade.nameArabic} — كتاب الطالب وكتاب التمارين للفصلين الدراسيين`}
+  canonicalSlug={`/grade/${grade.number}/${book.code}`}
+>
+  <section class="pt-28 pb-8 sm:pt-36 sm:pb-8 md:pt-44 md:pb-8 px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-6 entrance-1">
+        <a href="/" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        <a href={`/grade/${grade.number}`} class="hover:text-cyan-400 transition-colors">الصف {grade.nameArabic}</a>
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        <span class="text-white">{book.subject}</span>
+      </div>
+
+      <!-- Book Header -->
+      <div class="glass rounded-3xl p-6 sm:p-8 border border-slate-800/60 entrance-2">
+        <div class="flex items-center gap-4 sm:gap-6">
+          <div class={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${book.coverGradient} flex items-center justify-center shrink-0 shadow-xl`}>
+            <i class={`fa-solid ${book.icon} text-white text-2xl sm:text-3xl`}></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1">{book.subject}</h1>
+            <p class="text-slate-400 text-sm">
+              الصف {grade.nameArabic} {grade.nameEnglish}
+            </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              {book.semesters?.map(sem => (
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700/50">
+                  {sem.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Semester Sections -->
+  <section class="px-4 pb-16 sm:pb-20">
+    <div class="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+      {book.semesters?.map((sem, idx) => (
+        <div class={`entrance-${(idx % 3) + 2}`}>
+          <!-- Semester header -->
+          <div class="flex items-center gap-3 mb-3 sm:mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex items-center justify-center">
+              <i class="fa-solid fa-book text-cyan-400 text-sm"></i>
+            </div>
+            <h2 class="text-lg sm:text-xl font-bold text-white">{sem.label}</h2>
+          </div>
+
+          <!-- Dual book blocks side by side -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <!-- Student Book -->
+            <BookDetailBlock
+              bookType="studentBook"
+              data={sem.studentBook}
+              accentColor={accentColor}
+              label="كتاب الطالب"
+              icon={book.icon}
+              semesterLabel={sem.label}
+            />
+
+            <!-- Activity Book -->
+            <BookDetailBlock
+              bookType="activityBook"
+              data={sem.activityBook}
+              accentColor={accentColor}
+              label="كتاب التمارين"
+              icon="fa-pen-to-square"
+              semesterLabel={sem.label}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Back to grade -->
+  <section class="px-4 pb-12">
+    <div class="max-w-4xl mx-auto text-center">
+      <a
+        href={`/grade/${grade.number}`}
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 border border-slate-700 hover:border-cyan-500/30 hover:text-cyan-300 transition-all duration-300"
+      >
+        <i class="fa-solid fa-arrow-right"></i>
+        العودة إلى كتب الصف {grade.nameArabic}
+      </a>
+    </div>
+  </section>
+</BaseLayout>

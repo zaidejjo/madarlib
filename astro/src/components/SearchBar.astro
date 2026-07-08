@@ -1,0 +1,176 @@
+---
+interface GradeBook {
+  number: number;
+  nameArabic: string;
+  nameEnglish: string;
+  books: Array<{
+    subject: string;
+    code: string;
+    icon: string;
+    coverGradient: string;
+    semesters: Array<{ label: string }>;
+  }>;
+}
+
+interface Props {
+  grades: GradeBook[];
+}
+
+const { grades } = Astro.props;
+
+// Build the search data JSON for client-side usage
+const searchData = grades.map(g => ({
+  number: g.number,
+  nameArabic: g.nameArabic,
+  nameEnglish: g.nameEnglish,
+  books: (g.books || []).map(b => ({
+    subject: b.subject,
+    code: b.code,
+    icon: b.icon,
+    coverGradient: b.coverGradient,
+    semesters: (b.semesters || []).map(s => ({ label: s.label })),
+  })),
+}));
+---
+
+<div class="relative max-w-2xl mx-auto" id="searchWidget">
+  <!-- Embed data as JSON for client-side JS -->
+  <script id="searchData" type="application/json">{JSON.stringify(searchData)}</script>
+
+  <div class="relative glass rounded-2xl flex items-center px-4 py-3 border border-slate-700/50">
+    <i class="fa-solid fa-search text-slate-500 ml-3"></i>
+    <input
+      id="globalSearch"
+      type="text"
+      placeholder="ابحث عن كتاب (اسم المادة، رقم الصف...)"
+      class="w-full bg-transparent text-white placeholder-slate-500 outline-none text-sm"
+      autocomplete="off"
+    />
+    <kbd class="hidden sm:inline-flex text-xs text-slate-600 bg-slate-800 px-2 py-0.5 rounded border border-slate-700/50">⌘K</kbd>
+  </div>
+  <div
+    id="searchResults"
+    class="absolute top-full mt-2 w-full glass-strong rounded-2xl overflow-hidden max-h-96 overflow-y-auto hidden border border-slate-700/50 shadow-2xl"
+  ></div>
+</div>
+
+<script>
+  // ── Build search index from embedded JSON ──
+  const searchDataEl = document.getElementById('searchData');
+  const grades = searchDataEl ? JSON.parse(searchDataEl.textContent || '[]') : [];
+
+  const index = grades.flatMap(grade =>
+    (grade.books || []).map(book => ({
+      id: `${grade.number}-${book.code}`,
+      gradeNumber: grade.number,
+      gradeNameAr: grade.nameArabic,
+      gradeNameEn: grade.nameEnglish,
+      subjectAr: book.subject,
+      subjectCode: book.code,
+      url: `/grade/${grade.number}/${book.code}`,
+      icon: book.icon || 'fa-book',
+      coverGradient: book.coverGradient || 'from-slate-700 to-slate-900',
+      semesterLabels: (book.semesters || []).map(s => s.label),
+    }))
+  );
+
+  // ── DOM refs ──
+  const input = document.getElementById('globalSearch');
+  const resultsContainer = document.getElementById('searchResults');
+
+  if (!input || !resultsContainer) throw new Error('Search DOM elements not found');
+
+  // ── Search logic ──
+  function search(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return index.filter(item =>
+      item.subjectAr.includes(q) ||
+      item.subjectCode.includes(q) ||
+      item.gradeNameAr.includes(q) ||
+      item.gradeNameEn.toLowerCase().includes(q) ||
+      String(item.gradeNumber).includes(q)
+    );
+  }
+
+  // ── Render results ──
+  function renderResults(items) {
+    if (items.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="p-8 text-center">
+          <i class="fa-solid fa-book-open text-slate-700 text-4xl mb-3"></i>
+          <p class="text-slate-500 text-sm">لا توجد نتائج لبحثك</p>
+          <p class="text-slate-600 text-xs mt-1">حاول بكلمات مختلفة</p>
+        </div>
+      `;
+      return;
+    }
+
+    resultsContainer.innerHTML = items.map(item => `
+      <a href="${item.url}"
+         class="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-slate-800 last:border-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${item.coverGradient} flex items-center justify-center shrink-0">
+          <i class="fa-solid ${item.icon} text-white text-sm"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-white text-sm font-medium truncate">${item.subjectAr}</div>
+          <div class="text-slate-400 text-xs">${item.gradeNameAr} • ${item.semesterLabels.join('، ')}</div>
+        </div>
+        <i class="fa-solid fa-arrow-left text-slate-600 text-xs shrink-0"></i>
+      </a>
+    `).join('');
+  }
+
+  // ── Debounce & event handlers ──
+  let debounceTimer;
+  let selectedIndex = -1;
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const results = search(input.value);
+      renderResults(results);
+      resultsContainer.classList.remove('hidden');
+      selectedIndex = -1;
+    }, 300);
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      const results = search(input.value);
+      renderResults(results);
+      resultsContainer.classList.remove('hidden');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const widget = document.getElementById('searchWidget');
+    if (widget && !widget.contains(e.target)) {
+      resultsContainer.classList.add('hidden');
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const links = resultsContainer.querySelectorAll('a');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, links.length - 1);
+      if (links[selectedIndex]) links[selectedIndex].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      if (links[selectedIndex]) links[selectedIndex].focus();
+    } else if (e.key === 'Escape') {
+      resultsContainer.classList.add('hidden');
+      input.blur();
+    }
+  });
+
+  // ── Keyboard shortcut: ⌘K / Ctrl+K ──
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+</script>

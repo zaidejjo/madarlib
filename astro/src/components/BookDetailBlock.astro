@@ -1,0 +1,96 @@
+---
+interface BookData {
+  url: string;
+  pages?: number;
+  sizeMB?: number;
+}
+
+interface Props {
+  bookType: 'studentBook' | 'activityBook';
+  data: BookData | null;
+  accentColor: string;
+  label: string;
+  icon: string;
+  semesterLabel: string;
+}
+
+const { bookType, data, accentColor, label, icon, semesterLabel } = Astro.props;
+const isAvailable = data !== null && data !== undefined;
+
+// Map accent color to Tailwind classes for buttons
+const accentMap: Record<string, { fill: string; fillHover: string; outline: string; text: string }> = {
+  sky:    { fill: 'bg-sky-600', fillHover: 'hover:bg-sky-500', outline: 'border-sky-500/30 text-sky-300 hover:bg-sky-500/10', text: 'text-sky-300' },
+  amber:  { fill: 'bg-amber-600', fillHover: 'hover:bg-amber-500', outline: 'border-amber-500/30 text-amber-300 hover:bg-amber-500/10', text: 'text-amber-300' },
+  teal:   { fill: 'bg-teal-600', fillHover: 'hover:bg-teal-500', outline: 'border-teal-500/30 text-teal-300 hover:bg-teal-500/10', text: 'text-teal-300' },
+  pink:   { fill: 'bg-pink-600', fillHover: 'hover:bg-pink-500', outline: 'border-pink-500/30 text-pink-300 hover:bg-pink-500/10', text: 'text-pink-300' },
+  orange: { fill: 'bg-orange-600', fillHover: 'hover:bg-orange-500', outline: 'border-orange-500/30 text-orange-300 hover:bg-orange-500/10', text: 'text-orange-300' },
+  indigo: { fill: 'bg-indigo-600', fillHover: 'hover:bg-indigo-500', outline: 'border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10', text: 'text-indigo-300' },
+  cyan:   { fill: 'bg-cyan-600', fillHover: 'hover:bg-cyan-500', outline: 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10', text: 'text-cyan-300' },
+  blue:   { fill: 'bg-blue-600', fillHover: 'hover:bg-blue-500', outline: 'border-blue-500/30 text-blue-300 hover:bg-blue-500/10', text: 'text-blue-300' },
+  emerald:{ fill: 'bg-emerald-600', fillHover: 'hover:bg-emerald-500', outline: 'border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10', text: 'text-emerald-300' },
+  violet: { fill: 'bg-violet-600', fillHover: 'hover:bg-violet-500', outline: 'border-violet-500/30 text-violet-300 hover:bg-violet-500/10', text: 'text-violet-300' },
+  fuchsia:{ fill: 'bg-fuchsia-600', fillHover: 'hover:bg-fuchsia-500', outline: 'border-fuchsia-500/30 text-fuchsia-300 hover:bg-fuchsia-500/10', text: 'text-fuchsia-300' },
+};
+
+const colors = accentMap[accentColor] || accentMap.cyan;
+---
+
+<div class="glass rounded-2xl p-4 sm:p-5 border border-slate-800/60">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-3">
+    <div class={`w-10 h-10 rounded-xl bg-gradient-to-br ${icon.includes('book') ? 'from-emerald-600/40 to-slate-800' : 'from-cyan-600/40 to-slate-800'} flex items-center justify-center`}>
+      <i class={`fa-solid ${icon} text-white/80 text-sm`}></i>
+    </div>
+    <div>
+      <h4 class="text-white text-sm sm:text-base font-bold">{label}</h4>
+      <p class="text-slate-500 text-xs">{semesterLabel}</p>
+    </div>
+  </div>
+
+  {isAvailable ? (
+    <>
+      <!-- Metadata -->
+      {data.pages && data.sizeMB && (
+        <div class="flex items-center gap-4 mb-3 text-xs text-slate-400">
+          <span class="flex items-center gap-1">
+            <i class="fa-regular fa-file-lines"></i>
+            {data.pages} صفحة
+          </span>
+          <span class="flex items-center gap-1">
+            <i class="fa-regular fa-floppy-disk"></i>
+            {data.sizeMB} MB
+          </span>
+        </div>
+      )}
+
+      <!-- Dual-action buttons -->
+      <div class="flex flex-col xs:flex-row gap-2">
+        <!-- Open / View -->
+        <a
+          href={data.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 border ${colors.outline}`}
+        >
+          <i class="fa-solid fa-eye"></i>
+          <span>فتح الكتاب</span>
+        </a>
+
+        <!-- Download -->
+        <a
+          href={data.url}
+          download
+          class={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-white transition-all duration-300 ${colors.fill} ${colors.fillHover} active:scale-[0.97] shadow-lg`}
+        >
+          <i class="fa-solid fa-download"></i>
+          <span>تنزيل الكتاب</span>
+        </a>
+      </div>
+    </>
+  ) : (
+    <div class="flex items-center justify-center gap-2 py-3 text-slate-600 text-xs sm:text-sm">
+      <i class="fa-solid fa-ban"></i>
+      <span>غير متوفر حالياً</span>
+    </div>
+  )}
+</div>
