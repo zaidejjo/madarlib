@@ -28,7 +28,7 @@ export default {
         xs: '420px',
       },
       fontFamily: {
-        sans: ['"Cairo"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        sans: ['"IBM Plex Sans Arabic"', '"Segoe UI"', 'system-ui', 'sans-serif'],
       },
       animation: {
         'slide-up': 'slide-up 0.5s ease-out forwards',
