@@ -1,0 +1,177 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalSlug?: string;
+}
+
+const { title, description, image, canonicalSlug } = Astro.props;
+const site = 'https://madarlib.pages.dev';
+const canonicalUrl = canonicalSlug ? `${site}${canonicalSlug}` : site;
+const ogImage = image || `${site}/logo.webp`;
+const isHome = Astro.url.pathname === '/';
+---
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme: FOUC prevention + View Transition persistence -->
+    <script is:inline>
+      (function() {
+        // ── Apply theme class based on localStorage or system preference ──
+        function applyTheme() {
+          try {
+            var saved = localStorage.getItem('theme');
+            var prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefers)) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          } catch(e) {}
+        }
+
+        // Run immediately — prevents FOUC on initial paint
+        applyTheme();
+
+        // Re-apply after each Astro View Transition DOM swap.
+        // The <html> classList gets reset during the swap, so this
+        // ensures the user's preference is restored right after.
+        document.addEventListener('astro:after-swap', applyTheme);
+
+        // ── Re-attach event listeners after every page load ──
+        // Astro replaces <body> on navigation, so all DOM node references
+        // from the previous page become stale. We must re-bind to the
+        // fresh elements after each transition.
+        document.addEventListener('astro:page-load', function() {
+          // Theme toggle button
+          var toggle = document.getElementById('theme-toggle');
+          if (toggle) {
+            // Remove any stale listener via clone trick isn't needed—
+            // the button element is brand new after a swap.
+            toggle.addEventListener('click', function() {
+              var html = document.documentElement;
+              var isDark = html.classList.toggle('dark');
+              try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
+            });
+          }
+
+          // Smart back button
+          var backBtn = document.getElementById('back-btn');
+          if (backBtn && backBtn.dataset.isHome !== 'true') {
+            backBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                window.location.href = '/';
+              }
+            });
+          }
+        });
+      })();
+    </script>
+
+    <!-- ClientRouter — SPA view transitions -->
+    <ClientRouter fallback="swap" />
+
+    <!-- Primary Meta -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/webp" href="/logo.webp" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- IBM Plex Sans Arabic is self-hosted in public/fonts — no CDN -->
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  </head>
+  <body class="antialiased" style="background-color: var(--bg); color: var(--text);">
+    <!-- Navbar -->
+    <nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-6xl rounded-2xl px-5 py-3 flex items-center justify-between shadow-lg z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800">
+      <!-- Logo + Home Link -->
+      <a href="/" class="flex items-center gap-3 group shrink-0" data-astro-prefetch>
+        <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+          <i class="fa-solid fa-book-open text-white dark:text-zinc-900 text-base"></i>
+        </div>
+        <span class="text-zinc-900 dark:text-white font-extrabold text-xl tracking-tight">مكتبة مدار</span>
+      </a>
+
+      <!-- Nav links (desktop) -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/" class="text-zinc-500 dark:text-zinc-400 text-sm font-medium hover:text-zinc-900 dark:hover:text-white transition-colors duration-200" data-astro-prefetch>الرئيسية</a>
+        <a href="/#grades" class="text-zinc-500 dark:text-zinc-400 text-sm font-medium hover:text-zinc-900 dark:hover:text-white transition-colors duration-200" data-astro-prefetch>الصفوف</a>
+      </div>
+
+      <!-- Right actions -->
+      <div class="flex items-center gap-2">
+        <!-- Theme Toggle -->
+        <button
+          id="theme-toggle"
+          class="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+          aria-label="تبديل المظهر"
+        >
+          <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+          <i class="fa-solid fa-sun hidden dark:inline-block text-sm"></i>
+        </button>
+
+        <!-- Back / Site Link -->
+        <a
+          href="https://madarcore.onrender.com"
+          id="back-btn"
+          data-is-home={isHome ? 'true' : 'false'}
+          class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200 shrink-0"
+        >
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+          <span>الرجوع للموقع</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Spacer for fixed navbar -->
+    <div class="h-20"></div>
+
+    <!-- Main Content -->
+    <main class="relative" style="background-color: var(--bg);">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-200 dark:border-zinc-800 mt-20" style="background-color: var(--bg);">
+      <div class="max-w-6xl mx-auto px-4 py-10">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
+              <i class="fa-solid fa-book-open text-white dark:text-zinc-900 text-xs"></i>
+            </div>
+            <span class="text-zinc-900 dark:text-white font-bold text-sm">مكتبة مدار</span>
+          </div>
+          <p class="text-zinc-400 dark:text-zinc-500 text-sm font-medium">جميع الكتب متاحة للتحميل المجاني &copy; {new Date().getFullYear()}</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Theme + Navigation scripts live in <head> via astro:page-load -->
+  </body>
+</html>
