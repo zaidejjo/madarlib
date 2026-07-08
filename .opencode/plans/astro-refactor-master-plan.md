@@ -986,14 +986,133 @@ Google's viewer ignores the `Content-Disposition` header and renders the PDF inl
 
 ---
 
+---
+
+## Phase 8: Premium Visual Overhaul — Shadcn/Radix Standards, Premium Arabic Typography, High-Fidelity Layouts
+
+### 8.1 — Premium Arabic Typography
+
+**Migration:** Drop `Tajawal` in favor of `Cairo`, a superfamily designed specifically for the Arabic script with a modern, editorial aesthetic. Cairo offers weights 200–1000, excellent readability at body sizes, and striking presence at display sizes.
+
+**Font loading strategy:**
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+```
+
+**Typographic scale (global.css):**
+```css
+body {
+  font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+}
+
+h1, h2, h3, h4 { letter-spacing: -0.02em; }
+```
+
+| Element | Family | Weight | Leading |
+|---------|--------|--------|---------|
+| Hero heading (h1) | Cairo | 900 (black) | 1.1 |
+| Section heading (h2) | Cairo | 800 (extra-bold) | 1.2 |
+| Card title | Cairo | 700 (bold) | 1.3 |
+| Body | Cairo | 500 (medium) | 1.8 |
+| Small/meta | Cairo | 400 (regular) | 1.6 |
+
+### 8.2 — Immersive Homepage (`index.astro`)
+
+Completely rebuilt from scratch with a luxury dashboard aesthetic:
+
+**Hero Section:**
+- Massive gradient headline "مكتبة مدار الرقمية" in Cairo Black (900) with optional `background-clip` gradient
+- Subtle parallax ambient glow orbs (cyan/indigo/violet) with `backdrop-blur-3xl`
+- Premium badge "المكتبة الرقمية للكتب المدرسية" with subtle glass + border
+- CTA buttons as Shadcn-style primary (gradient fill) + secondary (ghost/outline)
+- Stats grid as glass metric tiles with icon + number + label, separated by delicate dividers
+
+**Search Section:**
+- Prominent centered search bar with glass effect, icon prefix, ⌘K badge
+- Animated dropdown results with icons, subject name, grade badge
+
+**Grade Grid:**
+- 4-column responsive grid of luxury dashboard tiles
+- Each tile: gradient background, large grade number, "الصف" label, book count badge, subtle arrow indicator on hover
+- Tiles glow with accent gradient border on hover, using the grade's unique accent
+- Entrance staggered animations matching Radix timing
+
+### 8.3 — Luxury Grade Cards (`GradeCard.astro`)
+
+Each card is a dashboard tile with:
+- Full-bleed gradient background from `books.json`
+- Glass overlay with `backdrop-blur-md`
+- Grade number displayed as a large, bold numeral in premium stacking
+- "الصف" label in subtle muted text
+- Book count badge (pill, glass + border)
+- Hover: `translateY(-8px)`, `shadow-2xl` with accent glow, gradient border via `::before`
+- Active press: `scale(0.98)` per Radix interaction spec
+
+### 8.4 — Premium Book Detail View (`[bookCode].astro`)
+
+**Layout:**
+- Top breadcrumb with `data-astro-prefetch`
+- Glowing hero card: book icon in multi-layered gradient square, subject name + grade + semester tags
+- Dynamic accent color derived from `grade.accentColor` applied to glow/shadow of hero icon
+
+**Semester Sections:**
+- Each semester is a 2-column grid (student book + activity book)
+- Each book is rendered by `BookDetailBlock.astro` as a premium card
+
+**BookDetailBlock Shadcn-style cards:**
+- Glass card with subtle `border-white/5`
+- Header: icon (gradient bg) + label + semester label
+- If available: metadata row (pages, size) in muted text with icons
+- Dual actions matching Shadcn button variants:
+  - **فتح الكتاب (Open/View)**: `outline` variant — border-only, subtle hover fill, launches PDF modal
+  - **تنزيل الكتاب (Download)**: `default` variant — filled gradient bg, white text, downloads directly
+- Each button has: `focus-visible:ring-2`, `active:scale-[0.97]`, smooth `transition-all`
+
+### 8.5 — Motion & Micro-interactions (Radix-Level)
+
+| Element | Interaction | Duration | Easing |
+|---------|-------------|----------|--------|
+| Grade card hover | translateY(-8px) + shadow glow | 400ms | cubic-bezier(0.34, 1.56, 0.64, 1) |
+| Grade card active | scale(0.98) | 100ms | ease |
+| Book card hover | translateY(-4px) + border glow | 300ms | ease-out |
+| Button hover | bg shift, border glow | 200ms | ease |
+| Button active | scale(0.97) | 100ms | ease |
+| Focus ring | ring-2 + ring-offset-2 | 150ms | ease |
+| Modal enter | scale(0.92 → 1) + fade | 300ms | cubic-bezier(0.34, 1.56, 0.64, 1) |
+| Page transition | vt-fade-out 250ms + vt-fade-in 300ms | 300ms | ease-out / ease-in |
+
+### 8.6 — Files Changed
+
+| File | Change |
+|------|--------|
+| `.opencode/plans/astro-refactor-master-plan.md` | Append Phase 8 |
+| `astro/src/layouts/BaseLayout.astro` | Cairo font, refined navbar |
+| `astro/src/styles/global.css` | Premium typography, shadcn animations, refined modal |
+| `astro/src/pages/index.astro` | Complete rebuild — immersive hero, stats, grid |
+| `astro/src/components/GradeCard.astro` | Luxury dashboard tile |
+| `astro/src/components/BookCard.astro` | Premium media card |
+| `astro/src/pages/grade/[grade].astro` | Refined header + grid |
+| `astro/src/components/BookDetailBlock.astro` | Shadcn-style card + buttons |
+| `astro/src/pages/grade/[grade]/[bookCode].astro` | Refined hero + semester layout |
+| `astro/src/components/SearchBar.astro` | Premium search refinements |
+| `astro/src/components/PdfPreviewModal.astro` | Premium modal with Cairo font |
+
+---
+
 ## Implementation Sequence (Updated)
 
 | Step | Action | Risk | Commit Message |
 |------|--------|------|----------------|
-| 1 | **Scaffold Astro project** with bun, Tailwind v3, PostCSS | Low | `feat: scaffold astro project with tailwind and sitemap` |
-| 2 | **Build all pages** (home, grades, book details) + components + search | Medium | `feat: implement all pages, routing, components, and search` |
-| 3 | **Fix bugs** — bun, Tailwind, SearchBar JSON.parse | Medium | `fix: convert to bun, fix tailwind and searchbar` |
-| 4 | **Add View Transitions, Prefetching, PDF Preview Modal, Premium UI** | Medium | `feat: add view transitions, prefetching, preview modal, premium ux` |
+| 1 | Scaffold Astro project | Low | `feat: scaffold astro project` |
+| 2 | Build all pages + components + search | Medium | `feat: implement all pages, routing, components, and search` |
+| 3 | Fix bugs | Medium | `fix: convert to bun, fix tailwind and searchbar` |
+| 4 | Add View Transitions, Prefetching, PDF Modal, Premium UX | Medium | `feat: add view transitions, prefetching, preview modal, premium ux` |
+| 5 | Premium visual overhaul — Cairo typography, Shadcn layouts, immersive pages | Medium | `style: complete premium visual overhaul with shadcn standards, gorgeous arabic typography, and high-fidelity layouts` |
 
 ---
 

@@ -17,33 +17,33 @@ interface Props {
 const { bookType, data, accentColor, label, icon, semesterLabel } = Astro.props;
 const isAvailable = data !== null && data !== undefined;
 
-// Map accent color to Tailwind classes for buttons
-const accentMap: Record<string, { fill: string; fillHover: string; outline: string; text: string }> = {
-  sky:    { fill: 'bg-sky-600', fillHover: 'hover:bg-sky-500', outline: 'border-sky-500/30 text-sky-300 hover:bg-sky-500/10', text: 'text-sky-300' },
-  amber:  { fill: 'bg-amber-600', fillHover: 'hover:bg-amber-500', outline: 'border-amber-500/30 text-amber-300 hover:bg-amber-500/10', text: 'text-amber-300' },
-  teal:   { fill: 'bg-teal-600', fillHover: 'hover:bg-teal-500', outline: 'border-teal-500/30 text-teal-300 hover:bg-teal-500/10', text: 'text-teal-300' },
-  pink:   { fill: 'bg-pink-600', fillHover: 'hover:bg-pink-500', outline: 'border-pink-500/30 text-pink-300 hover:bg-pink-500/10', text: 'text-pink-300' },
-  orange: { fill: 'bg-orange-600', fillHover: 'hover:bg-orange-500', outline: 'border-orange-500/30 text-orange-300 hover:bg-orange-500/10', text: 'text-orange-300' },
-  indigo: { fill: 'bg-indigo-600', fillHover: 'hover:bg-indigo-500', outline: 'border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10', text: 'text-indigo-300' },
-  cyan:   { fill: 'bg-cyan-600', fillHover: 'hover:bg-cyan-500', outline: 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10', text: 'text-cyan-300' },
-  blue:   { fill: 'bg-blue-600', fillHover: 'hover:bg-blue-500', outline: 'border-blue-500/30 text-blue-300 hover:bg-blue-500/10', text: 'text-blue-300' },
-  emerald:{ fill: 'bg-emerald-600', fillHover: 'hover:bg-emerald-500', outline: 'border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10', text: 'text-emerald-300' },
-  violet: { fill: 'bg-violet-600', fillHover: 'hover:bg-violet-500', outline: 'border-violet-500/30 text-violet-300 hover:bg-violet-500/10', text: 'text-violet-300' },
-  fuchsia:{ fill: 'bg-fuchsia-600', fillHover: 'hover:bg-fuchsia-500', outline: 'border-fuchsia-500/30 text-fuchsia-300 hover:bg-fuchsia-500/10', text: 'text-fuchsia-300' },
+// Map accent color to Shadcn-style button classes
+const accentMap: Record<string, { fill: string; fillHover: string; outline: string; glow: string }> = {
+  sky:    { fill: 'from-sky-500 to-sky-700', fillHover: 'hover:from-sky-400 hover:to-sky-600', outline: 'border-sky-500/30 text-sky-300 hover:bg-sky-500/10 hover:border-sky-400/50 focus-visible:ring-sky-400', glow: 'shadow-sky-500/20 hover:shadow-sky-500/30' },
+  amber:  { fill: 'from-amber-500 to-amber-700', fillHover: 'hover:from-amber-400 hover:to-amber-600', outline: 'border-amber-500/30 text-amber-300 hover:bg-amber-500/10 hover:border-amber-400/50 focus-visible:ring-amber-400', glow: 'shadow-amber-500/20 hover:shadow-amber-500/30' },
+  teal:   { fill: 'from-teal-500 to-teal-700', fillHover: 'hover:from-teal-400 hover:to-teal-600', outline: 'border-teal-500/30 text-teal-300 hover:bg-teal-500/10 hover:border-teal-400/50 focus-visible:ring-teal-400', glow: 'shadow-teal-500/20 hover:shadow-teal-500/30' },
+  pink:   { fill: 'from-pink-500 to-pink-700', fillHover: 'hover:from-pink-400 hover:to-pink-600', outline: 'border-pink-500/30 text-pink-300 hover:bg-pink-500/10 hover:border-pink-400/50 focus-visible:ring-pink-400', glow: 'shadow-pink-500/20 hover:shadow-pink-500/30' },
+  orange: { fill: 'from-orange-500 to-orange-700', fillHover: 'hover:from-orange-400 hover:to-orange-600', outline: 'border-orange-500/30 text-orange-300 hover:bg-orange-500/10 hover:border-orange-400/50 focus-visible:ring-orange-400', glow: 'shadow-orange-500/20 hover:shadow-orange-500/30' },
+  indigo: { fill: 'from-indigo-500 to-indigo-700', fillHover: 'hover:from-indigo-400 hover:to-indigo-600', outline: 'border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10 hover:border-indigo-400/50 focus-visible:ring-indigo-400', glow: 'shadow-indigo-500/20 hover:shadow-indigo-500/30' },
+  cyan:   { fill: 'from-cyan-500 to-cyan-700', fillHover: 'hover:from-cyan-400 hover:to-cyan-600', outline: 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-400/50 focus-visible:ring-cyan-400', glow: 'shadow-cyan-500/20 hover:shadow-cyan-500/30' },
+  blue:   { fill: 'from-blue-500 to-blue-700', fillHover: 'hover:from-blue-400 hover:to-blue-600', outline: 'border-blue-500/30 text-blue-300 hover:bg-blue-500/10 hover:border-blue-400/50 focus-visible:ring-blue-400', glow: 'shadow-blue-500/20 hover:shadow-blue-500/30' },
+  emerald:{ fill: 'from-emerald-500 to-emerald-700', fillHover: 'hover:from-emerald-400 hover:to-emerald-600', outline: 'border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-400/50 focus-visible:ring-emerald-400', glow: 'shadow-emerald-500/20 hover:shadow-emerald-500/30' },
+  violet: { fill: 'from-violet-500 to-violet-700', fillHover: 'hover:from-violet-400 hover:to-violet-600', outline: 'border-violet-500/30 text-violet-300 hover:bg-violet-500/10 hover:border-violet-400/50 focus-visible:ring-violet-400', glow: 'shadow-violet-500/20 hover:shadow-violet-500/30' },
+  fuchsia:{ fill: 'from-fuchsia-500 to-fuchsia-700', fillHover: 'hover:from-fuchsia-400 hover:to-fuchsia-600', outline: 'border-fuchsia-500/30 text-fuchsia-300 hover:bg-fuchsia-500/10 hover:border-fuchsia-400/50 focus-visible:ring-fuchsia-400', glow: 'shadow-fuchsia-500/20 hover:shadow-fuchsia-500/30' },
 };
 
 const colors = accentMap[accentColor] || accentMap.cyan;
 ---
 
-<div class="glass rounded-2xl p-4 sm:p-5 border border-slate-800/60">
+<div class="glass rounded-2xl p-5 sm:p-6 border border-slate-800/50 h-full flex flex-col">
   <!-- Header -->
-  <div class="flex items-center gap-3 mb-3">
-    <div class={`w-10 h-10 rounded-xl bg-gradient-to-br ${icon.includes('book') ? 'from-emerald-600/40 to-slate-800' : 'from-cyan-600/40 to-slate-800'} flex items-center justify-center`}>
+  <div class="flex items-center gap-3 mb-4">
+    <div class={`w-11 h-11 rounded-xl bg-gradient-to-br ${icon.includes('book') ? 'from-emerald-600/40 to-slate-800' : 'from-cyan-600/40 to-slate-800'} flex items-center justify-center shadow-lg`}>
       <i class={`fa-solid ${icon} text-white/80 text-sm`}></i>
     </div>
     <div>
-      <h4 class="text-white text-sm sm:text-base font-bold">{label}</h4>
-      <p class="text-slate-500 text-xs">{semesterLabel}</p>
+      <h4 class="text-white text-base sm:text-lg font-bold">{label}</h4>
+      <p class="text-slate-500 text-xs sm:text-sm font-medium">{semesterLabel}</p>
     </div>
   </div>
 
@@ -51,42 +51,42 @@ const colors = accentMap[accentColor] || accentMap.cyan;
     <>
       <!-- Metadata -->
       {data.pages && data.sizeMB && (
-        <div class="flex items-center gap-4 mb-3 text-xs text-slate-400">
-          <span class="flex items-center gap-1">
-            <i class="fa-regular fa-file-lines"></i>
+        <div class="flex items-center gap-4 mb-4 text-xs sm:text-sm text-slate-500 font-medium">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-regular fa-file-lines text-slate-600"></i>
             {data.pages} صفحة
           </span>
-          <span class="flex items-center gap-1">
-            <i class="fa-regular fa-floppy-disk"></i>
+          <span class="flex items-center gap-1.5">
+            <i class="fa-regular fa-floppy-disk text-slate-600"></i>
             {data.sizeMB} MB
           </span>
         </div>
       )}
 
-      <!-- Dual-action buttons -->
-      <div class="flex flex-col xs:flex-row gap-2">
-        <!-- Open / View (preview modal via custom event) -->
+      <!-- Shadcn-style dual action buttons -->
+      <div class="flex flex-col xs:flex-row gap-2.5 mt-auto">
+        <!-- Open / View — Outline variant -->
         <button
           data-preview-url={data.url}
-          class={`preview-btn flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 border cursor-pointer ${colors.outline}`}
+          class={`preview-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 active:scale-[0.97] cursor-pointer ${colors.outline}`}
         >
-          <i class="fa-solid fa-eye"></i>
+          <i class="fa-solid fa-eye text-xs"></i>
           <span>فتح الكتاب</span>
         </button>
 
-        <!-- Download -->
+        <!-- Download — Filled gradient variant -->
         <a
           href={data.url}
           download
-          class={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-white transition-all duration-300 ${colors.fill} ${colors.fillHover} active:scale-[0.97] shadow-lg`}
+          class={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white transition-all duration-200 bg-gradient-to-r ${colors.fill} ${colors.fillHover} active:scale-[0.97] shadow-lg ${colors.glow} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900`}
         >
-          <i class="fa-solid fa-download"></i>
+          <i class="fa-solid fa-download text-xs"></i>
           <span>تنزيل الكتاب</span>
         </a>
       </div>
     </>
   ) : (
-    <div class="flex items-center justify-center gap-2 py-3 text-slate-600 text-xs sm:text-sm">
+    <div class="flex items-center justify-center gap-2 py-6 text-slate-600 text-sm font-medium mt-auto">
       <i class="fa-solid fa-ban"></i>
       <span>غير متوفر حالياً</span>
     </div>

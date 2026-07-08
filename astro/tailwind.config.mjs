@@ -27,7 +27,7 @@ export default {
         xs: '420px',
       },
       fontFamily: {
-        sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        sans: ['"Cairo"', '"Segoe UI"', 'system-ui', 'sans-serif'],
       },
       animation: {
         float: 'float 7s ease-in-out infinite',

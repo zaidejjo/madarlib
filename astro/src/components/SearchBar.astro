@@ -34,16 +34,16 @@ const clientGrades = grades.map(g => ({
 ---
 
 <div class="relative max-w-2xl mx-auto" id="searchWidget">
-  <div class="relative glass rounded-2xl flex items-center px-4 py-3 border border-slate-700/50">
-    <i class="fa-solid fa-search text-slate-500 ml-3"></i>
+  <div class="relative glass rounded-2xl flex items-center px-5 py-3.5 border border-slate-700/50 transition-all duration-200 focus-within:border-cyan-500/30 focus-within:shadow-lg focus-within:shadow-cyan-500/5">
+    <i class="fa-solid fa-search text-slate-500 ml-3 text-sm"></i>
     <input
       id="globalSearch"
       type="text"
       placeholder="ابحث عن كتاب (اسم المادة، رقم الصف...)"
-      class="w-full bg-transparent text-white placeholder-slate-500 outline-none text-sm"
+      class="w-full bg-transparent text-white placeholder-slate-600 outline-none text-sm sm:text-base font-medium"
       autocomplete="off"
     />
-    <kbd class="hidden sm:inline-flex text-xs text-slate-600 bg-slate-800 px-2 py-0.5 rounded border border-slate-700/50">⌘K</kbd>
+    <kbd class="hidden sm:inline-flex text-xs text-slate-600 bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/50 font-bold">⌘K</kbd>
   </div>
   <div
     id="searchResults"
@@ -53,7 +53,6 @@ const clientGrades = grades.map(g => ({
 
 <script define:vars={{ clientGrades }}>
   // clientGrades is injected safely by Astro's define:vars — NO JSON.parse needed
-  // It is a plain JavaScript object, directly usable.
 
   const index = clientGrades.flatMap(grade =>
     (grade.books || []).map(book => ({
@@ -95,8 +94,8 @@ const clientGrades = grades.map(g => ({
       resultsContainer.innerHTML = `
         <div class="p-8 text-center">
           <i class="fa-solid fa-book-open text-slate-700 text-4xl mb-3"></i>
-          <p class="text-slate-500 text-sm">لا توجد نتائج لبحثك</p>
-          <p class="text-slate-600 text-xs mt-1">حاول بكلمات مختلفة</p>
+          <p class="text-slate-500 text-sm font-medium">لا توجد نتائج لبحثك</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">حاول بكلمات مختلفة</p>
         </div>
       `;
       return;
@@ -104,13 +103,13 @@ const clientGrades = grades.map(g => ({
 
     resultsContainer.innerHTML = items.map(item => `
       <a href="${item.url}"
-         class="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-slate-800 last:border-0">
+         class="flex items-center gap-3.5 px-5 py-3.5 hover:bg-white/5 transition-colors border-b border-slate-800 last:border-0">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${item.coverGradient} flex items-center justify-center shrink-0">
           <i class="fa-solid ${item.icon} text-white text-sm"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="text-white text-sm font-medium truncate">${item.subjectAr}</div>
-          <div class="text-slate-400 text-xs">${item.gradeNameAr} • ${item.semesterLabels.join('، ')}</div>
+          <div class="text-white text-sm font-bold truncate">${item.subjectAr}</div>
+          <div class="text-slate-500 text-xs font-medium">${item.gradeNameAr} • ${item.semesterLabels.join('، ')}</div>
         </div>
         <i class="fa-solid fa-arrow-left text-slate-600 text-xs shrink-0"></i>
       </a>

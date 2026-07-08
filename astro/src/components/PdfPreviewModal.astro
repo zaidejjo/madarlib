@@ -1,7 +1,7 @@
 <!--
   PdfPreviewModal — Premium PDF preview via Google Docs Viewer.
   Triggered by the custom "open-preview" event with { url } in detail.
-  Vanilla JS, no framework needed — handles open, close, escape, backdrop.
+  Vanilla JS — handles open, close, escape, backdrop.
 -->
 <div
   id="pdf-preview-modal"
@@ -14,17 +14,17 @@
   <div
     id="modal-panel"
     class="relative w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border border-slate-700/40 shadow-2xl overflow-hidden"
-    style="background: rgba(12, 20, 35, 0.96); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);"
+    style="background: rgba(2, 6, 23, 0.96); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 shrink-0">
-      <h3 class="text-white font-bold text-sm flex items-center gap-2">
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-800/80 shrink-0">
+      <h3 class="text-white font-bold text-sm flex items-center gap-2.5">
         <i class="fa-solid fa-book-open text-cyan-400"></i>
         معاينة الكتاب
       </h3>
       <button
         id="modal-close"
-        class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90"
+        class="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
         aria-label="إغلاق"
       >
         <i class="fa-solid fa-xmark"></i>
@@ -42,17 +42,17 @@
         title="معاينة الكتاب"
       ></iframe>
       <!-- Loading placeholder -->
-      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center bg-slate-900/80">
+      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center" style="background: rgba(2, 6, 23, 0.85);">
         <div class="text-center">
           <i class="fa-solid fa-spinner text-cyan-400 text-3xl animate-spin mb-3"></i>
-          <p class="text-slate-400 text-sm">جاري تحميل المعاينة...</p>
+          <p class="text-slate-400 text-sm font-medium">جاري تحميل المعاينة...</p>
         </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-800/80 shrink-0">
-      <div class="flex items-center gap-2 text-xs text-slate-500">
+    <div class="flex items-center justify-between px-5 py-3 border-t border-slate-800/80 shrink-0">
+      <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
         <i class="fa-regular fa-clock"></i>
         يتم التحميل من مستندات جوجل
       </div>
@@ -62,9 +62,9 @@
           href="#"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 text-slate-300 hover:border-cyan-500/30 hover:text-cyan-300 transition-all duration-200"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border border-slate-700/60 text-slate-300 hover:border-cyan-500/30 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.97] transition-all duration-200"
         >
-          <i class="fa-solid fa-external-link-alt"></i>
+          <i class="fa-solid fa-external-link-alt text-xs"></i>
           فتح في علامة تبويب
         </a>
       </div>

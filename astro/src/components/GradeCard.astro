@@ -21,30 +21,34 @@ function toArabicNum(n: number): string {
 <a
   href={`/grade/${number}`}
   data-astro-prefetch
-  class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between border shadow-lg text-right w-full"
-  style="background: {cardBg}; border-color: rgba(30, 41, 59, 0.6);"
+  class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-7 flex flex-col justify-between border shadow-lg text-right w-full"
+  style="background: {cardBg}; border-color: rgba(30, 41, 59, 0.5);"
 >
+  <!-- Glass overlay -->
+  <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
+
   <!-- Top row -->
-  <div class="flex items-start justify-between">
+  <div class="relative flex items-start justify-between z-10">
     <div
       class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-lg sm:text-xl shadow-lg shrink-0"
       style="background: {iconGradient};"
     >
       <i class="fa-solid fa-graduation-cap"></i>
     </div>
-    <span class={`px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border ${badgeClass}`}>
+    <span class={`px-3 py-1 rounded-full text-xs sm:text-sm font-bold border backdrop-blur-sm ${badgeClass}`}>
       {toArabicNum(bookCount)} كتب
     </span>
   </div>
 
   <!-- Bottom row -->
-  <div class="mt-auto">
-    <h3 class="text-white text-xl sm:text-2xl font-bold mb-1">{nameArabic}</h3>
-    <p class="text-slate-400 text-xs sm:text-sm">{nameEnglish}</p>
+  <div class="relative z-10 mt-auto">
+    <p class="text-slate-500 text-xs sm:text-sm font-medium mb-0.5">الصف</p>
+    <h3 class="text-white text-2xl sm:text-3xl font-black mb-0.5">{nameArabic}</h3>
+    <p class="text-slate-400 text-xs sm:text-sm font-medium">{nameEnglish}</p>
   </div>
 
   <!-- Arrow icon -->
-  <div class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-    <i class="fa-solid fa-arrow-left text-lg sm:text-xl" style="color: {arrowCSS};"></i>
+  <div class="absolute bottom-6 sm:bottom-7 left-6 sm:left-7 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 z-10">
+    <i class="fa-solid fa-arrow-left text-xl sm:text-2xl" style="color: {arrowCSS};"></i>
   </div>
 </a>

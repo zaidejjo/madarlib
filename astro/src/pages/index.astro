@@ -20,77 +20,108 @@ const totalSubjects = [...new Set(grades.flatMap(g => g.books?.map(b => b.code) 
   description="حمل جميع كتبك المدرسية من الصف الأول إلى الصف الثاني عشر بضغطة زر واحدة. سهل، سريع، ومتاح دائماً."
   canonicalSlug="/"
 >
-  <!-- HERO -->
-  <section class="pt-28 pb-12 sm:pt-36 sm:pb-16 md:pt-44 md:pb-20 px-4">
-    <div class="max-w-5xl mx-auto text-center">
-      <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs sm:text-sm font-medium mb-4 sm:mb-6 entrance-1">
-        <i class="fa-solid fa-graduation-cap text-xs sm:text-sm"></i>
+  <!-- ════════════════════════════════════════════════════
+       HERO — Immersive landing
+       ════════════════════════════════════════════════════ -->
+  <section class="relative pt-32 pb-16 sm:pt-40 sm:pb-20 md:pt-48 md:pb-24 px-4 overflow-hidden">
+    <div class="max-w-5xl mx-auto text-center relative">
+      <!-- Premium badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-cyan-500/15 text-cyan-300 text-xs sm:text-sm font-semibold mb-6 entrance-1 tracking-wide">
+        <i class="fa-solid fa-graduation-cap text-xs"></i>
         <span>المكتبة الرقمية للكتب المدرسية</span>
       </div>
-      <h1 class="text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 entrance-2">
+
+      <!-- Hero headline -->
+      <h1 class="text-[2.8rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-black mb-6 entrance-2">
         <span class="gradient-text">مكتبة مدار</span>
         <br>
         <span class="text-white/90">الرقمية</span>
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3">
+
+      <p class="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3 font-medium">
         حمل جميع كتبك المدرسية من
-        <span class="text-cyan-300 font-semibold">الصف الأول</span>
+        <span class="text-cyan-300 font-bold">الصف الأول</span>
         إلى
-        <span class="text-violet-300 font-semibold">الصف الثاني عشر</span>
+        <span class="text-violet-300 font-bold">الصف الثاني عشر</span>
         بضغطة زر واحدة. سهل، سريع، ومتاح دائماً.
       </p>
-      <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-10 entrance-4">
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-10 entrance-4">
         <a href="#grades"
-           class="group relative inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.98] transition-all duration-300 overflow-hidden min-h-[48px]">
+           class="group relative inline-flex items-center justify-center gap-2.5 w-full xs:w-auto px-8 py-3.5 rounded-xl font-bold text-base bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.97] transition-all duration-200 overflow-hidden min-h-[52px]">
           <span class="relative z-10">تصفح الكتب</span>
-          <i class="fa-solid fa-arrow-down relative z-10 group-hover:translate-y-0.5 transition-transform text-xs sm:text-sm"></i>
+          <i class="fa-solid fa-arrow-down relative z-10 group-hover:translate-y-0.5 transition-transform text-sm"></i>
           <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </a>
         <a href="#stats"
-           class="group inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base min-h-[48px] border border-slate-700 text-slate-300 hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.98] transition-all duration-300">
-          <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-xs sm:text-sm"></i>
+           class="group inline-flex items-center justify-center gap-2.5 w-full xs:w-auto px-8 py-3.5 rounded-xl font-semibold text-base border border-slate-700/60 text-slate-300 hover:border-cyan-500/30 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.97] transition-all duration-200 min-h-[52px]">
+          <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-sm"></i>
           <span>المميزات</span>
         </a>
       </div>
 
-      <!-- Stats -->
-      <div id="stats" class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-16 mt-12 sm:mt-16 entrance-5">
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">{toArabicNum(12)}</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">صف دراسي</div>
+      <!-- Stats — Premium metric tiles -->
+      <div id="stats" class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-16 entrance-5">
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl glass border border-slate-800/40">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-layer-group text-cyan-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black gradient-text">{toArabicNum(12)}</div>
+            <div class="text-slate-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">صف دراسي</div>
+          </div>
         </div>
-        <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">+{toArabicNum(totalBooks || 60)}</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">كتاب مدرسي</div>
+
+        <div class="hidden sm:block w-px h-12 bg-slate-800/60"></div>
+
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl glass border border-slate-800/40">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-book text-violet-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black gradient-text">+{toArabicNum(totalBooks || 60)}</div>
+            <div class="text-slate-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">كتاب مدرسي</div>
+          </div>
         </div>
-        <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
-        <div class="text-center">
-          <div class="text-2xl sm:text-3xl font-bold gradient-text">{toArabicNum(totalSubjects || 5)}</div>
-          <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">مواد دراسية</div>
+
+        <div class="hidden sm:block w-px h-12 bg-slate-800/60"></div>
+
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl glass border border-slate-800/40">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-flask text-emerald-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black gradient-text">{toArabicNum(totalSubjects || 5)}</div>
+            <div class="text-slate-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">مواد دراسية</div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SEARCH -->
+  <!-- ════════════════════════════════════════════════════
+       SEARCH
+       ════════════════════════════════════════════════════ -->
   <section class="px-4 pb-8 sm:pb-12">
     <div class="max-w-6xl mx-auto">
       <SearchBar grades={grades} />
     </div>
   </section>
 
-  <!-- GRADES GRID -->
-  <section id="grades" class="px-4 pb-16 sm:pb-20 md:pb-24">
+  <!-- ════════════════════════════════════════════════════
+       GRADES GRID — Premium dashboard tiles
+       ════════════════════════════════════════════════════ -->
+  <section id="grades" class="px-4 pb-20 sm:pb-24 md:pb-32">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-8 sm:mb-10 md:mb-12">
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">اختر صفك الدراسي</h2>
-        <p class="text-slate-400 text-sm sm:text-base">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
+      <div class="text-center mb-10 sm:mb-12 md:mb-14">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3">اختر صفك الدراسي</h2>
+        <p class="text-slate-400 text-base sm:text-lg font-medium">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
         {grades.map((grade, i) => (
-          <div class={`entrance-${(i % 5) + 1}`}>
+          <div class={`entrance-${(i % 7) + 1}`}>
             <GradeCard
               number={grade.number}
               nameArabic={grade.nameArabic}
