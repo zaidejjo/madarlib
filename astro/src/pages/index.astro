@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GradeCard from '../components/GradeCard.astro';
+import SearchBar from '../components/SearchBar.astro';
+
+const { grades } = await import('../data/books.json');
+
+function toArabicNum(n: number): string {
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return String(n).split('').map(c => arabicDigits[parseInt(c)] || c).join('');
+}
+
+const totalBooks = grades.reduce((sum, g) => sum + (g.books?.length || 0), 0);
+const gradesWithBooks = grades.filter(g => (g.books?.length || 0) > 0).length;
+const totalSubjects = [...new Set(grades.flatMap(g => g.books?.map(b => b.code) || []))].length;
+---
+
+<BaseLayout
+    title="مكتبة مدار | للمنهاج الاردني"
+  description="حمل جميع كتبك المدرسية من الصف الأول إلى الصف الثاني عشر بضغطة زر واحدة. سهل، سريع، ومتاح دائماً."
+  canonicalSlug="/"
+>
+  <!-- ════════════════════════════════════════════════════
+       HERO — Clean corporate landing
+       ════════════════════════════════════════════════════ -->
+  <section class="relative pt-20 pb-16 sm:pt-24 sm:pb-20 md:pt-28 md:pb-24 px-4 overflow-hidden">
+    <div class="max-w-5xl mx-auto text-center relative">
+      <!-- Semantic badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border surface text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm font-semibold mb-6 entrance-1 tracking-wide">
+        <i class="fa-solid fa-graduation-cap text-xs"></i>
+        <span>المكتبة الرقمية للكتب المدرسية</span>
+      </div>
+
+      <!-- Hero headline — solid color, no gradient text -->
+      <h1 class="text-[2.8rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-black mb-6 entrance-2" style="color: var(--text);">
+        مكتبة مدار
+        <br>
+        <!-- <span class="text-zinc-500 dark:text-zinc-400">الرقمية</span> -->
+      </h1>
+
+      <p class="text-zinc-500 dark:text-zinc-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3 font-medium">
+        حمل جميع كتبك المدرسية من
+        <span class="font-bold" style="color: var(--text);">الصف الأول</span>
+        إلى
+        <span class="font-bold" style="color: var(--text);">الصف الثاني عشر</span>
+        بضغطة زر واحدة. سهل، سريع، ومتاح دائماً.
+      </p>
+
+      <!-- CTA Buttons — Shadcn solid fills -->
+      <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-10 entrance-4">
+        <a href="#grades"
+           class="group relative inline-flex items-center justify-center gap-2.5 w-full xs:w-auto px-8 py-3.5 rounded-xl font-bold text-base text-white dark:text-zinc-900 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.97] transition-all duration-200 min-h-[52px] shadow-sm">
+          <span>تصفح الكتب</span>
+          <i class="fa-solid fa-arrow-down group-hover:translate-y-0.5 transition-transform text-sm"></i>
+        </a>
+        <a href="#stats"
+           class="group inline-flex items-center justify-center gap-2.5 w-full xs:w-auto px-8 py-3.5 rounded-xl font-semibold text-base border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 active:scale-[0.97] transition-all duration-200 min-h-[52px]">
+          <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-sm"></i>
+          <span>المميزات</span>
+        </a>
+      </div>
+
+      <!-- Stats — Clean Shadcn metric cards -->
+      <div id="stats" class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-16 entrance-5">
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl surface">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center surface-hover">
+            <i class="fa-solid fa-layer-group text-zinc-600 dark:text-zinc-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black" style="color: var(--text);">{toArabicNum(12)}</div>
+            <div class="text-zinc-400 dark:text-zinc-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">صف دراسي</div>
+          </div>
+        </div>
+
+        <div class="hidden sm:block w-px h-12" style="background-color: var(--border);"></div>
+
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl surface">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center surface-hover">
+            <i class="fa-solid fa-book text-zinc-600 dark:text-zinc-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black" style="color: var(--text);">+{toArabicNum(totalBooks || 60)}</div>
+            <div class="text-zinc-400 dark:text-zinc-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">كتاب مدرسي</div>
+          </div>
+        </div>
+
+        <div class="hidden sm:block w-px h-12" style="background-color: var(--border);"></div>
+
+        <div class="flex items-center gap-4 px-6 py-4 rounded-2xl surface">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center surface-hover">
+            <i class="fa-solid fa-flask text-zinc-600 dark:text-zinc-400 text-lg"></i>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black" style="color: var(--text);">{toArabicNum(totalSubjects || 5)}</div>
+            <div class="text-zinc-400 dark:text-zinc-500 text-xs sm:text-sm font-medium mt-0.5 leading-tight">مواد دراسية</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       SEARCH
+       ════════════════════════════════════════════════════ -->
+  <section class="px-4 pb-8 sm:pb-12">
+    <div class="max-w-6xl mx-auto">
+      <SearchBar grades={grades} />
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       GRADES GRID — Clean dashboard tiles
+       ════════════════════════════════════════════════════ -->
+  <section id="grades" class="px-4 pb-20 sm:pb-24 md:pb-32">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-10 sm:mb-12 md:mb-14">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-3" style="color: var(--text);">اختر صفك الدراسي</h2>
+        <p class="text-zinc-500 dark:text-zinc-400 text-base sm:text-lg font-medium">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        {grades.map((grade, i) => (
+          <div class={`entrance-${(i % 7) + 1}`}>
+            <GradeCard
+              number={grade.number}
+              nameArabic={grade.nameArabic}
+              nameEnglish={grade.nameEnglish}
+              cardBg={grade.cardBg}
+              iconGradient={grade.iconGradient}
+              badgeClass={grade.badgeClass}
+              arrowCSS={grade.arrowCSS}
+              bookCount={grade.books?.length || 0}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

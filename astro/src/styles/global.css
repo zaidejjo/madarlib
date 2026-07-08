@@ -1,0 +1,298 @@
+/* ══════════════════════════════════════════════════════════════
+   Tailwind CSS v3 — Directives
+   ══════════════════════════════════════════════════════════════ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════════════════════════
+   IBM Plex Sans Arabic — Self-hosted (no external CDN)
+   Weights: 300 (Light), 400 (Regular), 500 (Medium),
+            600 (Semi-Bold), 700 (Bold)
+   ══════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic-300.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHADCN THEME — CSS Custom Properties (Zinc/Slate Palette)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #f4f4f5;
+  --surface: #ffffff;
+  --surface-hover: #f4f4f5;
+  --border: #e4e4e7;
+  --text: #18181b;
+  --text-muted: #71717a;
+  --text-subtle: #a1a1aa;
+  --accent: #18181b;
+  --accent-text: #fafafa;
+  --radius: 1rem;
+}
+
+.dark {
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface-hover: #27272a;
+  --border: #27272a;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-subtle: #52525b;
+  --accent: #fafafa;
+  --accent-text: #18181b;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL RESET & BASE
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: 'IBM Plex Sans Arabic', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   IBM PLEX SANS ARABIC TYPOGRAPHY
+   ══════════════════════════════════════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h1 { font-weight: 700; }
+h2 { font-weight: 700; }
+h3 { font-weight: 600; }
+h4 { font-weight: 600; }
+
+p { line-height: 1.8; }
+
+/* ══════════════════════════════════════════════════════════════
+   SHADCN SURFACE UTILITIES
+   ══════════════════════════════════════════════════════════════ */
+.surface {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.surface-hover {
+  background-color: var(--surface-hover);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRADE CARD — Clean Shadcn Tile
+   ══════════════════════════════════════════════════════════════ */
+.grade-card {
+  position: relative;
+  isolation: isolate;
+  min-height: 200px;
+  cursor: pointer;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .grade-card { min-height: 240px; }
+}
+
+.grade-card:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .grade-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.dark .grade-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOOK CARD — Clean Media Tile
+   ══════════════════════════════════════════════════════════════ */
+.book-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .book-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.dark .book-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.book-card:active {
+  transform: scale(0.98);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ENTRANCE ANIMATIONS
+   ══════════════════════════════════════════════════════════════ */
+.entrance-1  { animation: slide-up 0.4s ease-out 0.05s both; }
+.entrance-2  { animation: slide-up 0.4s ease-out 0.10s both; }
+.entrance-3  { animation: slide-up 0.4s ease-out 0.16s both; }
+.entrance-4  { animation: slide-up 0.4s ease-out 0.22s both; }
+.entrance-5  { animation: slide-up 0.4s ease-out 0.28s both; }
+.entrance-6  { animation: slide-up 0.4s ease-out 0.34s both; }
+.entrance-7  { animation: slide-up 0.4s ease-out 0.40s both; }
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ASTRO VIEW TRANSITIONS — SPA fade
+   ══════════════════════════════════════════════════════════════ */
+@keyframes vt-fade-out {
+  to { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+}
+
+html::view-transition-old(root) {
+  animation: vt-fade-out 200ms ease-out;
+}
+html::view-transition-new(root) {
+  animation: vt-fade-in 250ms ease-in;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PDF PREVIEW MODAL
+   ══════════════════════════════════════════════════════════════ */
+#pdf-preview-modal {
+  transition: opacity 0.3s ease;
+}
+
+#pdf-preview-modal.closed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#pdf-preview-modal:not(.closed) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#pdf-preview-modal #modal-panel {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#pdf-preview-modal.closed #modal-panel {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+#pdf-preview-modal:not(.closed) #modal-panel {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM SCROLLBAR
+   ══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--text-subtle);
+  border-radius: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SELECTION
+   ══════════════════════════════════════════════════════════════ */
+::selection {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SAFE AREA
+   ══════════════════════════════════════════════════════════════ */
+.nav-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HIDE UNTIL JS LOADS (prevents FOUC)
+   ══════════════════════════════════════════════════════════════ */
+.js-hidden { display: none !important; }

@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BookDetailBlock from '../../../components/BookDetailBlock.astro';
+import PdfPreviewModal from '../../../components/PdfPreviewModal.astro';
+
+export async function getStaticPaths() {
+  const { grades } = await import('../../../data/books.json');
+  const paths = [];
+  for (const grade of grades) {
+    for (const book of grade.books || []) {
+      paths.push({
+        params: { grade: String(grade.number), bookCode: book.code },
+        props: { grade, book },
+      });
+    }
+  }
+  return paths;
+}
+
+const { grade, book } = Astro.props;
+const accentColor = grade.accentColor || 'cyan';
+---
+
+<BaseLayout
+  title={`مكتبة مدار | ${book.subject} — الصف ${grade.nameArabic}`}
+  description={`تحميل كتاب ${book.subject} للصف ${grade.nameArabic} — كتاب الطالب وكتاب التمارين للفصلين الدراسيين`}
+  canonicalSlug={`/grade/${grade.number}/${book.code}`}
+>
+  <!-- ════════════════════════════════════════════════════
+       HERO — Book identity card, clean solid style
+       ════════════════════════════════════════════════════ -->
+  <section class="relative pt-12 pb-8 sm:pt-16 sm:pb-8 md:pt-16 md:pb-8 px-4">
+    <div class="max-w-5xl mx-auto">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-sm mb-8 entrance-1 font-medium" style="color: var(--text-muted);">
+        <a href="/" data-astro-prefetch class="transition-colors hover:opacity-70" style="color: var(--text-muted);">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px]" style="color: var(--text-subtle);"></i>
+        <a href={`/grade/${grade.number}`} data-astro-prefetch class="transition-colors hover:opacity-70" style="color: var(--text-muted);">الصف {grade.nameArabic}</a>
+        <i class="fa-solid fa-chevron-left text-[10px]" style="color: var(--text-subtle);"></i>
+        <span style="color: var(--text);">{book.subject}</span>
+      </div>
+
+      <!-- Book Hero Card — clean surface -->
+      <div class="rounded-3xl p-7 sm:p-9 border entrance-2" style="background-color: var(--surface); border-color: var(--border);">
+        <div class="flex items-center gap-5 sm:gap-8">
+          <!-- Icon — solid surface, no glow -->
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+               style="background-color: var(--surface-hover);">
+            <i class={`fa-solid ${book.icon} text-3xl sm:text-4xl`} style="color: var(--text-muted);"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black mb-1.5" style="color: var(--text);">{book.subject}</h1>
+            <p class="text-sm sm:text-base font-medium mb-3" style="color: var(--text-muted);">
+              الصف {grade.nameArabic}
+            </p>
+            <div class="flex flex-wrap gap-2">
+              {book.semesters?.map(sem => (
+                <span class="px-3 py-1 rounded-full text-xs font-bold border"
+                      style="color: var(--text-muted); background-color: var(--surface-hover); border-color: var(--border);">
+                  {sem.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════
+       SEMESTER SECTIONS — Dual book grids
+       ════════════════════════════════════════════════════ -->
+  <section class="px-4 pb-20 sm:pb-24">
+    <div class="max-w-5xl mx-auto space-y-8 sm:space-y-10">
+      {book.semesters?.map((sem, idx) => (
+        <div class={`entrance-${(idx % 3) + 2}`}>
+          <!-- Semester header -->
+          <div class="flex items-center gap-3 mb-4 sm:mb-5">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: var(--surface-hover);">
+              <i class="fa-solid fa-book text-base" style="color: var(--text-muted);"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--text);">{sem.label}</h2>
+          </div>
+
+          <!-- Dual book cards side by side -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <!-- Student Book -->
+            <BookDetailBlock
+              bookType="studentBook"
+              data={sem.studentBook}
+              accentColor={accentColor}
+              label="كتاب الطالب"
+              icon={book.icon}
+              semesterLabel={sem.label}
+            />
+
+            <!-- Activity Book -->
+            <BookDetailBlock
+              bookType="activityBook"
+              data={sem.activityBook}
+              accentColor={accentColor}
+              label="كتاب التمارين"
+              icon="fa-pen-to-square"
+              semesterLabel={sem.label}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Back to grade -->
+  <section class="px-4 pb-12">
+    <div class="max-w-5xl mx-auto text-center">
+      <a
+        href={`/grade/${grade.number}`}
+        data-astro-prefetch
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold border transition-all duration-200 active:scale-[0.97]"
+        style="border-color: var(--border); color: var(--text);"
+        onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+        onmouseout="this.style.backgroundColor='transparent'"
+      >
+        <i class="fa-solid fa-arrow-right"></i>
+        العودة إلى كتب الصف {grade.nameArabic}
+      </a>
+    </div>
+  </section>
+
+  <!-- PDF Preview Modal -->
+  <PdfPreviewModal />
+</BaseLayout>

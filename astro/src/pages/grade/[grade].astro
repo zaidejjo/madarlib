@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookCard from '../../components/BookCard.astro';
+
+export async function getStaticPaths() {
+  const { grades } = await import('../../data/books.json');
+  return grades.map(g => ({
+    params: { grade: String(g.number) },
+    props: { grade: g },
+  }));
+}
+
+const { grade } = Astro.props;
+const bookCount = grade.books?.length || 0;
+---
+
+<BaseLayout
+  title={`مكتبة مدار | الصف ${grade.nameArabic}`}
+  description={`جميع كتب الصف ${grade.nameArabic} — تحميل كتب الطالب وكراسات التمارين للفصلين الدراسيين`}
+  canonicalSlug={`/grade/${grade.number}`}
+>
+  <section class="relative pt-12 pb-12 sm:pt-16 sm:pb-16 md:pt-16 md:pb-12 px-4">
+    <div class="max-w-6xl mx-auto">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-sm mb-8 entrance-1 font-medium" style="color: var(--text-muted);">
+        <a href="/" data-astro-prefetch class="transition-colors hover:opacity-70" style="color: var(--text-muted);">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px]" style="color: var(--text-subtle);"></i>
+        <span style="color: var(--text);">الصف {grade.nameArabic}</span>
+      </div>
+
+      <!-- Title -->
+      <div class="text-right entrance-2">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black mb-3" style="color: var(--text);">
+          الصف {grade.nameArabic}
+        </h1>
+        <p class="text-base sm:text-lg font-medium" style="color: var(--text-muted);">
+          {bookCount > 0
+            ? `${bookCount} كتاب متاح`
+            : 'لا توجد كتب متاحة حالياً'}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Books Grid -->
+  <section class="px-4 pb-20 sm:pb-24">
+    <div class="max-w-6xl mx-auto">
+      {bookCount > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+          {grade.books.map((book, i) => (
+            <div class={`entrance-${(i % 7) + 1}`}>
+              <BookCard
+                subject={book.subject}
+                code={book.code}
+                icon={book.icon}
+                coverGradient={book.coverGradient}
+                semesters={book.semesters}
+                gradeNumber={grade.number}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center" style="background-color: var(--surface-hover);">
+            <i class="fa-solid fa-book-open text-3xl" style="color: var(--text-subtle);"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2" style="color: var(--text);">لا توجد كتب متاحة لهذا الصف حالياً</h3>
+          <p class="text-base font-medium mb-8" style="color: var(--text-muted);">يرجى التحقق لاحقاً</p>
+          <a href="/" data-astro-prefetch class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200"
+             style="border-color: var(--border); color: var(--text);"
+             onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+             onmouseout="this.style.backgroundColor='transparent'">
+            <i class="fa-solid fa-arrow-right"></i>
+            العودة إلى الرئيسية
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

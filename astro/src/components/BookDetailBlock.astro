@@ -1,0 +1,100 @@
+---
+interface BookData {
+  url: string;
+  pages?: number;
+  sizeMB?: number;
+}
+
+interface Props {
+  bookType: 'studentBook' | 'activityBook';
+  data: BookData | null;
+  accentColor: string;
+  label: string;
+  icon: string;
+  semesterLabel: string;
+}
+
+const { bookType, data, label, icon, semesterLabel } = Astro.props;
+const isAvailable = data !== null && data !== undefined;
+---
+
+<div class="rounded-2xl p-5 sm:p-6 border h-full flex flex-col"
+     style="background-color: var(--surface); border-color: var(--border);">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm"
+         style="background-color: var(--surface-hover);">
+      <i class={`fa-solid ${icon} text-sm`} style="color: var(--text-muted);"></i>
+    </div>
+    <div>
+      <h4 class="text-base sm:text-lg font-bold" style="color: var(--text);">{label}</h4>
+      <p class="text-xs sm:text-sm font-medium" style="color: var(--text-muted);">{semesterLabel}</p>
+    </div>
+  </div>
+
+  {isAvailable ? (
+    <>
+      <!-- Metadata -->
+      {data.pages && data.sizeMB && (
+        <div class="flex items-center gap-4 mb-4 text-xs sm:text-sm font-medium" style="color: var(--text-muted);">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-regular fa-file-lines" style="color: var(--text-subtle);"></i>
+            {data.pages} صفحة
+          </span>
+          <span class="flex items-center gap-1.5">
+            <i class="fa-regular fa-floppy-disk" style="color: var(--text-subtle);"></i>
+            {data.sizeMB} MB
+          </span>
+        </div>
+      )}
+
+      <!-- Shadcn dual action buttons — solid filled + outline -->
+      <div class="flex flex-col xs:flex-row gap-2.5 mt-auto">
+        <!-- Open / View — Outline variant -->
+        <button
+          data-preview-url={data.url}
+          class="preview-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 border active:scale-[0.97] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+          style="border-color: var(--border); color: var(--text); background-color: transparent;"
+          onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+          onmouseout="this.style.backgroundColor='transparent'"
+        >
+          <i class="fa-solid fa-eye text-xs"></i>
+          <span>فتح الكتاب</span>
+        </button>
+
+        <!-- Download — Solid filled variant -->
+        <a
+          href={data.url}
+          download
+          class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold active:scale-[0.97] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 shadow-sm"
+          style="background-color: var(--accent); color: var(--accent-text);"
+          onmouseover="this.style.opacity='0.9'"
+          onmouseout="this.style.opacity='1'"
+        >
+          <i class="fa-solid fa-download text-xs"></i>
+          <span>تنزيل الكتاب</span>
+        </a>
+      </div>
+    </>
+  ) : (
+    <div class="flex items-center justify-center gap-2 py-6 text-sm font-medium mt-auto" style="color: var(--text-subtle);">
+      <i class="fa-solid fa-ban"></i>
+      <span>غير متوفر حالياً</span>
+    </div>
+  )}
+</div>
+
+<script>
+  // Wire up preview buttons to dispatch the open-preview event
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.preview-btn');
+    if (!btn) return;
+    var url = btn.getAttribute('data-preview-url');
+    if (url) {
+      e.preventDefault();
+      document.dispatchEvent(
+        new CustomEvent('open-preview', { detail: { url: url } })
+      );
+    }
+  });
+</script>

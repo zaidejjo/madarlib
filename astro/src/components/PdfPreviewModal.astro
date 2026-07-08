@@ -1,0 +1,139 @@
+<!--
+  PdfPreviewModal — PDF preview via Google Docs Viewer.
+  Triggered by custom "open-preview" event with { url } in detail.
+  Themed with CSS variables for light/dark consistency.
+-->
+<div
+  id="pdf-preview-modal"
+  class="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 closed"
+>
+  <!-- Backdrop -->
+  <div id="modal-backdrop" class="absolute inset-0" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);"></div>
+
+  <!-- Panel -->
+  <div
+    id="modal-panel"
+    class="relative w-full max-w-5xl max-h-[95vh] flex flex-col rounded-2xl border shadow-2xl overflow-hidden"
+    style="background-color: var(--surface); border-color: var(--border);"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-5 py-3.5 border-b shrink-0" style="border-color: var(--border);">
+      <h3 class="font-bold text-sm flex items-center gap-2.5" style="color: var(--text);">
+        <i class="fa-solid fa-book-open" style="color: var(--text-muted);"></i>
+        معاينة الكتاب
+      </h3>
+      <button
+        id="modal-close"
+        class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+        style="background-color: var(--surface-hover); color: var(--text-muted);"
+        aria-label="إغلاق"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Viewer -->
+    <div class="flex-1 relative min-h-0">
+      <iframe
+        id="preview-iframe"
+        src=""
+        class="absolute inset-0 w-full h-full"
+        frameborder="0"
+        allowfullscreen
+        title="معاينة الكتاب"
+      ></iframe>
+      <!-- Loading placeholder -->
+      <div id="modal-loading" class="absolute inset-0 flex items-center justify-center" style="background-color: var(--surface);">
+        <div class="text-center">
+          <i class="fa-solid fa-spinner text-3xl animate-spin mb-3" style="color: var(--text-muted);"></i>
+          <p class="text-sm font-medium" style="color: var(--text-muted);">جاري تحميل المعاينة...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-5 py-3 border-t shrink-0" style="border-color: var(--border);">
+      <div class="flex items-center gap-2 text-xs font-medium" style="color: var(--text-subtle);">
+        <i class="fa-regular fa-clock"></i>
+        يتم التحميل من مستندات جوجل
+      </div>
+      <div class="flex items-center gap-2">
+        <a
+          id="modal-open-tab"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200 active:scale-[0.97]"
+          style="border-color: var(--border); color: var(--text);"
+          onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+          onmouseout="this.style.backgroundColor='transparent'"
+        >
+          <i class="fa-solid fa-external-link-alt text-xs"></i>
+          فتح في علامة تبويب
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var modal = document.getElementById('pdf-preview-modal');
+    if (!modal) return;
+
+    var panel = document.getElementById('modal-panel');
+    var backdrop = document.getElementById('modal-backdrop');
+    var closeBtn = document.getElementById('modal-close');
+    var iframe = document.getElementById('preview-iframe');
+    var openTabLink = document.getElementById('modal-open-tab');
+    var loading = document.getElementById('modal-loading');
+
+    function openModal(url) {
+      var viewerUrl =
+        'https://docs.google.com/gview?url=' +
+        encodeURIComponent(url) +
+        '&embedded=true';
+      iframe.src = viewerUrl;
+      openTabLink.href = url;
+
+      // Show loading
+      if (loading) loading.style.display = 'flex';
+
+      // Clean up previous iframe load listener
+      iframe.onload = function () {
+        if (loading) loading.style.display = 'none';
+      };
+      // Timeout fallback — hide loading after 8s
+      setTimeout(function () {
+        if (loading) loading.style.display = 'none';
+      }, 8000);
+
+      modal.classList.remove('closed');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('closed');
+      document.body.style.overflow = '';
+      // Clear iframe after transition to stop the render
+      setTimeout(function () {
+        iframe.src = '';
+        if (loading) loading.style.display = 'flex';
+      }, 300);
+    }
+
+    // Listen for the custom event
+    document.addEventListener('open-preview', function (e) {
+      if (e.detail && e.detail.url) {
+        openModal(e.detail.url);
+      }
+    });
+
+    // Close handlers
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  })();
+</script>

@@ -2,83 +2,83 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
-    <loc>https://zaidejjo.github.io/books/</loc>
+    <loc>https://madarlib.pages.dev/books/</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Grade Pages (Dynamic) -->
-  <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=1</loc>
+  <!-- <url>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=1</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=2</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=2</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=3</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=3</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=4</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=4</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=5</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=5</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=6</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=6</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=7</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=7</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=8</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=8</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=9</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=9</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=10</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=10</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=11</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=11</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://zaidejjo.github.io/books/book.html?grade=12</loc>
+    <loc>https://madarlib.pages.dev/books/book.html?grade=12</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-</urlset>
+</urlset> -->

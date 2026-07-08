@@ -1,0 +1,1883 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+The content has been processed where content has been compressed (code blocks are separated by ⋮---- delimiter).
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.opencode/
+  plans/
+    dynamic-template-refactor.md
+.gitignore
+AGENTS.md
+book.html
+books.json
+googlee14860c9c412bf1f.html
+index.html
+logo.webp
+robots.txt
+sitemap.xml
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".opencode/plans/dynamic-template-refactor.md">
+# Refactoring Plan: Dynamic Single-Template Architecture
+
+**Date:** 2026-07-02
+**Author:** Senior Frontend Architect
+**Status:** Proposal — Awaiting Review
+
+---
+
+## Executive Summary
+
+Consolidate 12 duplicate grade HTML files into a single dynamic template (`book.html`), driven entirely by a centralized `books.json` data source containing direct GitHub Release PDF URLs. Preserve 100% of the current visual design.
+
+---
+
+## Current State Inventory
+
+| File | Role | Problem |
+|---|---|---|
+| `index.html` | Dashboard (Alpine.js SPA) | Contains inline `GRADES_DATA` + `COMMON_BOOKS` — hardcoded. Grade cards link to `{n}_book.html` pages. |
+| `book_template.html` | Template for grade pages | Vanilla JS engine, owns its own `GRADE_CONFIG`, builds paths from local PDFs. |
+| `1_book.html` … `12_book.html` | 12 duplicated grade pages | Each is a copy of `book_template.html` with only `GRADE_CONFIG` differing. Massive duplication (~7000+ lines of identical HTML/CSS). |
+| `style.css` | Legacy stylesheet | Not linked from any current page. Fire/neon theme from the old era. |
+| `books.json` | Partial data file | Contains only grades 9, 10, 11 (incomplete), with direct GitHub Release URLs. |
+| `books/grades/{1..12}/` | Local PDF directories | Contains the actual PDF files. Will be obsolete after migration to GitHub Release URLs. |
+
+### Key Observations
+
+1. **`index.html` uses Alpine.js** — a lightweight SPA framework. The dashboard is already an SPA with view-switching (`currentView: 'dashboard'` / `'grade'`). Currently, grade view data is inlined in `GRADES_DATA`.
+2. **Grade pages (`{n}_book.html`) use vanilla JS** — a completely separate engine from `index.html`. They are standalone HTML files, not part of the SPA.
+3. **The `books.json` structure** maps grade numbers to flat arrays of `{title, url}` objects. No subject metadata, no semester metadata — the title strings encode this (e.g., `"الكيمياء - الفصل الأول"`). This needs enrichment or the grades must derive subject/semester from the URL pattern (`{grade}_{code}_{term}.pdf`).
+4. **`index.html` grade cards** currently link to `{n}_book.html` — after refactoring, they will link to `book.html?grade={n}`.
+
+---
+
+## Phase 1: Architecture & Cleanup
+
+### Files to DELETE (13 files)
+
+| File | Reason |
+|---|---|
+| `book_template.html` | No longer needed — becomes the base for the new `book.html`. |
+| `1_book.html` … `12_book.html` | All replaced by `book.html?grade={n}`. |
+| `style.css` | Legacy fire/neon theme, not linked anywhere. Dead code. |
+
+### Files to KEEP (2 files)
+
+| File | What happens to it |
+|---|---|
+| `index.html` | **Refactored** — strip out inline `COMMON_BOOKS` / `GRADES_DATA` / `SUBJECT_HOVER`. Instead, fetch `books.json` at boot. Grade card links change from `9_book.html` to `book.html?grade=9`. |
+| `books.json` | **Expanded** — add all 12 grades with complete data. Enrich each entry with structured metadata (`subject`, `code`, `semester`, `icon`, `coverGradient`, `badgeClass`) instead of flat `title`/`url` only. |
+
+### File to CREATE (1 file)
+
+| File | Purpose |
+|---|---|
+| `book.html` | The single dynamic grade page. Reads `?grade=N` from the URL, fetches `books.json`, renders everything. **Must be a standalone page** (not an SPA fragment), because it can be linked directly and bookmarked. |
+
+### Directory that becomes OBSOLETE
+
+| Directory | Fate |
+|---|---|
+| `books/grades/*/` | PDFs are now hosted on GitHub Releases. These local PDFs can remain during transition but are no longer referenced by any code. Once the JSON is fully populated, this directory can be deleted entirely. |
+
+### Structural Diff (Before → After)
+
+```
+Before:
+  index.html           (Alpine SPA, inline GRADES_DATA)
+  1_book.html          (vanilla JS, inline GRADE_CONFIG)
+  2_book.html          (vanilla JS, inline GRADE_CONFIG)
+  ...
+  12_book.html         (vanilla JS, inline GRADE_CONFIG)
+  book_template.html   (template for above)
+  style.css            (legacy, unused)
+  books.json           (partial, grades 9-11 only)
+  books/grades/1/..12/ (local PDFs)
+
+After:
+  index.html           (Alpine SPA, fetches books.json at boot)
+  book.html            (dynamic, ?grade=N, fetches books.json)
+  books.json           (complete, all 12 grades, structured metadata)
+  books/grades/        (optional — phased out later)
+```
+
+---
+
+## Phase 2: Data Schema Design
+
+### Proposed `books.json` Structure
+
+The current schema is too flat. We need structured metadata for the rendering engine:
+
+```jsonc
+{
+  "grades": [
+    {
+      "number": 9,
+      "nameArabic": "التاسع",
+      "nameEnglish": "Grade 9",
+      "accentColor": "indigo",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #818cf8, #7c3aed)",
+      "badgeClass": "bg-indigo-500/10 border-indigo-500/20 text-indigo-300",
+      "arrowCSS": "#818cf8",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/.../9_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/.../9_ar_2.pdf" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Data Flow Diagram
+
+```
+                ┌─────────────┐
+                │  books.json │  (hosted alongside HTML files)
+                └──────┬──────┘
+                       │ fetch()
+          ┌────────────┼────────────┐
+          ▼                         ▼
+   ┌──────────────┐        ┌──────────────────┐
+   │  index.html  │        │  book.html       │
+   │  (Alpine.js) │        │  (?grade=9)      │
+   │              │        │  (vanilla JS)     │
+   │ fetches full │        │ fetches full     │
+   │ grades array │        │ grades array     │
+   │ renders       │        │ finds grade N   │
+   │ dashboard     │        │ renders books   │
+   │ + grade view  │        │ + filters       │
+   │ inline        │        └──────────────────┘
+   └──────────────┘
+```
+
+### Why NOT put the grade view inside index.html as an SPA route?
+
+- **Deep-linking**: Users bookmark `book.html?grade=9`. It must work as a standalone page.
+- **SEO**: Each grade has its own URL, title, and meta description.
+- **Simplicity**: Avoids Alpine.js router complexity. Each file has one clear job.
+
+---
+
+## Phase 3: JavaScript Logic Blueprint
+
+### `index.html` — Refactored Engine
+
+**Current state:** Alpine.js app with inline `GRADES_DATA` (12 hardcoded grade objects), `COMMON_BOOKS` (7 shared subject templates), `SUBJECT_HOVER`, `SEMESTER_STYLES`.
+
+**After refactoring:**
+
+1. **Remove** all inline data constants (`GRADES_DATA`, `COMMON_BOOKS`, `SUBJECT_HOVER`, `SEMESTER_STYLES`).
+2. **Add** a `fetchBooks()` function that loads `books.json` and stores the parsed array into Alpine's reactive state.
+3. **Loading state** while fetching: the Alpine SPA shows a shimmer/skeleton while the grade grid is empty.
+4. **Grade cards in dashboard** — their `onclick` changes from `window.location = '9_book.html'` to `window.location = 'book.html?grade=' + grade.number`.
+5. **Grade view inside `index.html`** (the SPA's `currentView === 'grade'` mode) — this already exists. Keep it, but now `filteredBookItems` derives `path`/`href` from the JSON `url` field instead of constructing local paths.
+6. The `selectGrade()` method also updates the URL with `history.pushState({}, '', '?grade=' + grade.number)` so the back button works within the SPA.
+
+### `book.html` — New Dynamic Engine
+
+**Design approach:** Use vanilla JS (matching the current template's approach, NOT Alpine) for simplicity and zero dependency beyond Tailwind CDN + Font Awesome. No framework needed — this is a single-purpose page.
+
+**Lifecycle:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  1. PARSE QUERY: const grade = new URLSearchParams(       │
+│     location.search).get('grade');                        │
+│                                                          │
+│  2. VALIDATE: if (!grade || grade < 1 || grade > 12) →   │
+│     show elegant error fallback (Phase 4).               │
+│                                                          │
+│  3. FETCH: load books.json via fetch().                   │
+│     Show animated skeleton cards while loading.          │
+│                                                          │
+│  4. FIND: locate grade.grades.find(g => g.number == N)   │
+│                                                          │
+│  5. RENDER:                                               │
+│     - Populate <title>, meta description                 │
+│     - Render filter pills from books[].code              │
+│     - Render book cards from books[].semesters[]         │
+│     - Wire filter click handlers                         │
+│     - Wire mobile menu                                   │
+│     - Remove skeleton loader, show real cards            │
+│                                                          │
+│  6. ERROR: if grade not found in data, show specific     │
+│     "no books for this grade" fallback (Phase 4).        │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Rendering Strategy for `book.html`
+
+Instead of the current `book_template.html` approach of `innerHTML` string concatenation (which works but is messy), use a **`renderBookCard(item)` function** that returns a DOM element and appends it. This gives cleaner code and makes the skeleton/animation swap trivial:
+
+```javascript
+// Conceptual pseudocode:
+function renderBookCard(book, semester, entranceIndex) {
+  const card = document.createElement('div');
+  // Apply all the existing book-card classes, cover gradients,
+  // badge colors, download button with shimmer, entrance stagger
+  card.className = 'book-card ... entrance-' + entranceIndex;
+  card.dataset.subject = book.code;
+  // ... build inner DOM structure matching current visual design exactly
+  card.querySelector('a.btn-download').href = semester.url;
+  return card;
+}
+```
+
+The HTML body of `book.html` will be a **copy of `book_template.html`'s body** — stripped of the `GRADE_CONFIG` script but retaining all `<style>` blocks, Tailwind config, decorative orbs, navbar, filter section shell, books grid shell (empty `<div id="booksGrid">`), footer, and mobile menu. The JS engine will inject content into these shells.
+
+---
+
+## Phase 4: Edge Cases & Robustness
+
+### 4.1 — Invalid Grade Parameter
+
+**Triggers:**
+- `?grade=99`
+- `?grade=0`
+- `?grade=-5`
+- `?grade=abc`
+- No `?grade` at all
+
+**Handling:**
+Show a styled error card centered on the page, matching the glass-morphism design language:
+
+```
+┌─────────────────────────────────────────┐
+│  [⚠️ Icon — fa-circle-exclamation]      │
+│                                         │
+│  الصف غير موجود                         │
+│  الرجاء اختيار صف من 1 إلى 12           │
+│                                         │
+│  [⬅️ العودة إلى الصفحة الرئيسية]        │
+│      (glass button → index.html)        │
+└─────────────────────────────────────────┘
+```
+
+Implementation: Before any fetch, validate `grade` with `parseInt()` + range check. If invalid, inject the error card into `#booksSection` and hide the filter bar. The navbar stays visible (branding + back-to-index link).
+
+### 4.2 — Loading State (Fetch in Progress)
+
+**Problem:** `index.html` loads books.json and renders the dashboard. `book.html` loads books.json and renders books. Both involve an async fetch. Without a loading state, the user sees an empty grid for 200-800ms — feels broken.
+
+**Solution: Skeleton Loader Cards**
+
+Render 8 placeholder "shimmer" cards immediately on page load, before the fetch fires. These are visually identical to real book cards but using pulse-animated gray gradients:
+
+```
+Real card: gradient cover, subject label, semester badge, download button
+Skeleton: gray shimmer bars for cover area, text lines, button shape
+```
+
+The skeleton uses the existing `animate-shimmer` keyframe (already defined in Tailwind config). When the fetch resolves, replace skeletons with real cards using the entrance stagger animation (`.entrance-b-*` classes).
+
+### 4.3 — Empty Grade (Valid grade number, but no books in JSON)
+
+**Handling:**
+If `grade.grades.find(g => g.number == N)` exists but `grade.books.length === 0`, show the existing empty-state design (already in `book_template.html` at line 502-509):
+
+```
+┌────────────────────────────────────────┐
+│  [fa-book-open icon, 64px, muted]      │
+│                                        │
+│  لا توجد كتب متاحة لهذا الصف حالياً      │
+│  يرجى التحقق لاحقاً                      │
+└────────────────────────────────────────┘
+```
+
+### 4.4 — Fetch Failure (Network Error / 404 on books.json)
+
+**Handling:**
+Show a distinct error state with a retry button:
+
+```
+┌────────────────────────────────────────┐
+│  [fa-cloud-bolt icon]                  │
+│                                        │
+│  حدث خطأ أثناء تحميل البيانات            │
+│                                        │
+│  [🔄 إعادة المحاولة]  ← refetches JSON  │
+│  [⬅️ العودة للرئيسية]  → index.html     │
+└────────────────────────────────────────┘
+```
+
+Implementation: `try/catch` around fetch, with an exponential-backoff retry (max 3 attempts, 1s/2s/4s delays) before showing the error state.
+
+### 4.5 — URL Pattern for Data Derivation (Temporary)
+
+Until `books.json` is fully enriched with per-semester `url` fields, the rendering engine can derive data from the flat entry's `title` string + `url` pattern:
+
+- Parse `title`: split on ` - ` → `[subjectArabic, semesterArabic]`
+- Parse `url`: match `/(\d+)_(\w+)_(\d+)\.pdf$/` → grade number, subject code, semester number
+- Map subject code → icon, cover gradient, etc. using a static lookup table within the JS engine
+
+This is a **transitional strategy** only. The long-term solution is enriching books.json.
+
+### 4.6 — Browser Back/Forward Button
+
+**`book.html`:** Already works — it's a standalone page with `?grade=N`. Browser history works natively.
+
+**`index.html` SPA grade view:** Currently uses Alpine view-switching without URL updating. Should add `history.pushState` on `selectGrade()` to make browser back/forward work within the SPA. On `goToDashboard()`, use `history.pushState({}, '', window.location.pathname)` to clean the URL.
+
+### 4.7 — Performance Optimization
+
+- **`books.json` caching:** Use `sessionStorage` as a cache layer. On first fetch, store `JSON.stringify(data)` + timestamp. Subsequent loads (e.g., back/forward navigation) read from cache first, then revalidate with a stale-while-revalidate pattern.
+- **`books.json` size:** Current payload is small (~3KB for 3 grades). Full 12 grades will be ~12KB. This is negligible — no pagination or lazy-loading needed.
+- **Tailwind CDN purging:** The hidden `<div>` with pre-declared classes (lines 776-804 in `index.html`) must be replicated in `book.html` to ensure Tailwind's JIT compiler sees all dynamic color combinations (12 accent colors × shadow variants × badge variants).
+
+---
+
+## Phase 5: Implementation Sequence (Recommended Order)
+
+This is the safe, rollback-friendly order of operations:
+
+| Step | Action | Risk |
+|---|---|---|
+| 1 | **Enrich `books.json`** — add all 12 grades with structured metadata (subjects, codes, icons, gradients, badge classes, accent data, GitHub Release URLs per semester). This is the foundation. | Low — just data editing. |
+| 2 | **Create `book.html`** — build the full dynamic template with skeleton loading, error handling, filter logic, mobile menu. **Test with `?grade=9`** against the enriched JSON. | Medium — net-new file, no existing pages broken. |
+| 3 | **Refactor `index.html`** — replace inline `GRADES_DATA` with fetch from `books.json`. Change grade card links to `book.html?grade=N`. Add skeleton loading for dashboard. Keep the in-SPA grade view working. | Medium — the homepage is critical. Do NOT delete old grade files yet. |
+| 4 | **QA all 12 grades** — test every `book.html?grade=1..12`, verify every download link resolves to a valid GitHub Release URL. | Low. |
+| 5 | **Delete old files** — `1_book.html`…`12_book.html`, `book_template.html`, `style.css`. | Low — already unreferenced. |
+| 6 | **Delete `books/grades/`** — optional cleanup. Only do this once all PDFs are confirmed hosted and accessible via GitHub Releases. | Low — but check GitHub Release links are live. |
+| 7 | **Update `index.html` grade card counts** — verify the `+١٢٠` stat badge matches the actual total across all grades in `books.json`. | Low. |
+
+---
+
+## Phase 6: Verification Checklist
+
+After implementation, verify:
+
+- [ ] `index.html` loads without console errors
+- [ ] Dashboard grade grid shows all 12 cards with correct colors, icons, counts
+- [ ] Clicking any grade card navigates to `book.html?grade=N`
+- [ ] `book.html?grade=5` renders correct books, correct accent color on download buttons
+- [ ] `book.html?grade=abc` shows elegant error fallback
+- [ ] `book.html?grade=99` shows elegant error fallback
+- [ ] `book.html?grade=` (empty) shows elegant error fallback
+- [ ] During fetches, skeleton shimmer cards appear
+- [ ] Filter pills work (All / Arabic / Math / English / Chemistry / Physics / Islamic / History)
+- [ ] Empty filter shows "no books" state
+- [ ] Mobile hamburger menu works, includes filter shortcuts
+- [ ] Browser back/forward works correctly
+- [ ] Every download link resolves to a real downloadable PDF
+- [ ] No 404 errors, no undefined links
+- [ ] RTL layout, glass navbar, floating orbs, gradient text, shimmer buttons — all visually preserved
+- [ ] All 12 accent colors render correctly across grades
+- [ ] `books/grades/` local PDF directory is no longer accessed by any code
+
+---
+
+## Architectural Decisions Summary
+
+| Decision | Rationale |
+|---|---|
+| Keep `index.html` as Alpine.js SPA | Already built, already works, already has in-SPA grade view. Minimal refactor — just replace inline data with fetch. |
+| Make `book.html` a standalone vanilla JS page | Must be deep-linkable/bookmarkable. Vanilla JS avoids framework overhead for a single-purpose page. Matches the existing template's approach. |
+| Enrich `books.json` with full structured metadata | Avoids fragile string-parsing at runtime. Single source of truth. Easy to edit/add grades. |
+| Use `sessionStorage` cache for `books.json` | Both `index.html` and `book.html` fetch the same file. Cache avoids double-fetch when navigating between them. |
+| NOT use a build system / bundler | Project is static HTML/CSS/JS. Adding a build step adds complexity with no benefit for this scale. |
+| Preserve all CSS classes and inline `<style>` blocks exactly | Requirement: do not modify visual design. The `<style>` blocks, Tailwind config, entrance animations, glass classes, accent CSS custom properties, shimmer keyframes — all copied verbatim. |
+</file>
+
+<file path=".gitignore">
+*.pdf
+</file>
+
+<file path="googlee14860c9c412bf1f.html">
+google-site-verification: googlee14860c9c412bf1f.html
+</file>
+
+<file path="robots.txt">
+User-agent: *
+Allow: /
+
+Sitemap: https://madarlib.pages.dev/sitemap.xml
+</file>
+
+<file path="sitemap.xml">
+<?xml version="1.0" encoding="UTF-8" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>https://zaidejjo.github.io/books/</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Grade Pages (Dynamic) -->
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=1</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=2</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=3</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=4</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=5</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=6</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=7</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=8</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=9</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=10</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=11</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zaidejjo.github.io/books/book.html?grade=12</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+</file>
+
+<file path="AGENTS.md">
+# GitHub Books Repository — Agent Guide
+
+Static HTML/CSS/JS website for downloading Arabic school textbooks (grades 1–12). No build system, tests, or backend.
+
+## View the site locally
+
+Open any HTML file directly in a browser:
+- **Homepage:** `index.html`
+- **Grade pages:** `1_book.html` … `12_book.html`
+
+## Adding a new grade page
+
+1. Copy the template: `cp book_template.html {n}_book.html`
+2. Edit only the `GRADE_CONFIG` JavaScript object near the top of the new file:
+   - `number`, `nameArabic`, `nameEnglish`, `slug`, `accentColor`
+   - Expand the `books` array if needed
+3. Place PDFs in `books/grades/{n}/` following the path pattern: `books/grades/{grade}/{grade}_{subjectCode}_{semester}.pdf`
+   - Subject codes: `ar` (Arabic), `math`, `en` (English), `ch` (Chemistry), `ph` (Physics)
+   - Semester: `1` (الفصل الأول) or `2` (الفصل الثاني)
+   - Example: `books/grades/9/9_ar_1.pdf`
+4. Update the grade card count badge on `index.html` (the `<span>` showing "١٠ كتب") if the book count changed.
+
+## Adding books to an existing grade
+
+- Place the PDF in `books/grades/{n}/` using the naming convention above.
+- The grade page auto-discovers books from its `GRADE_CONFIG.books` array. If the subject+semester combination doesn't exist in the config, add it there.
+- No need to edit the HTML body — the JavaScript engine renders cards dynamically.
+
+## Architecture notes
+
+- **Two eras:** The site was rewritten. `style.css` at root is **legacy** (old fire/neon theme) and is not linked from any current HTML file. All current pages use CDN Tailwind and inline `<style>` blocks.
+- **Universal template:** All 12 grade pages (`{n}_book.html`) derive from `book_template.html`. They share identical structure — only the `GRADE_CONFIG` JS object differs.
+- **Tailwind via CDN** (`https://cdn.tailwindcss.com`), configured via inline `tailwind.config` in `<script>`.
+- **Font Awesome 6.5.1** via CDN for icons.
+- **RTL layout:** All pages have `<html lang="ar" dir="rtl">`.
+- **No external CSS file is linked** in any current page.
+- **JavaScript** drives card rendering, filtering, entrance animations, and the mobile menu. The `.js-hidden` class prevents FOUC (flash of unstyled content) until JS loads.
+- **Download links** use both `download="{path}"` and `target="_blank"`.
+
+## Gotchas
+
+- `accentColor` in `GRADE_CONFIG` only maps to `cyan`, `blue`, `emerald`, `violet` in the JS engine. Grades 1 (uses `sky`) and 12 (uses `fuchsia`) use values outside the map, which fall back to `text-blue-400` silently — check the download button hover colors if adding new accent values.
+- The `book_template.html` header comment still says "cp book_template.html 8_book.html" — it now covers grades 1–12.
+- When updating the book count badge on `index.html`, the number uses Arabic-Indic digits (١٢٣ not 123).
+- The `books/` (flat) directory is also legacy — only `books/grades/{n}/` is actively used.
+</file>
+
+<file path="book.html">
+<!DOCTYPE html>
+<!--
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║                📚  DYNAMIC GRADE BOOK TEMPLATE                            ║
+║                                                                           ║
+║  This page is dynamically driven by books.json and URL parameters.        ║
+║  Usage: book.html?grade=9                                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020617" id="metaTheme">
+  <meta name="description" content="" id="metaDesc">
+  <title id="pageTitle">مكتبة مدار</title>
+  <link rel="icon" type="image/webp" href="logo.webp">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: { 'xs': '420px' },
+          fontFamily: {
+            sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 7s ease-in-out infinite',
+            'float-delayed': 'float 7s ease-in-out 3.5s infinite',
+            'slide-up': 'slide-up 0.6s ease-out forwards',
+            'shimmer': 'shimmer 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-24px)' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #020617;
+      background-image:
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 55%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+    .glass-strong {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .book-card {
+      opacity: 1;
+      transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+    .book-card.hidden-card { display: none; }
+    .book-card:active { transform: scale(0.98); }
+    @media (hover: hover) { .book-card:hover { transform: translateY(-6px); } }
+    .book-cover { position: relative; overflow: hidden; }
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to top, rgba(0,0,0,0.45), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .filter-pill {
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-pill.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.5);
+      color: #22d3ee;
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
+    }
+    .filter-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+    .gradient-text {
+      background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text-accent {
+      background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-download {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 44px;
+    }
+    .btn-download::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.04) 40%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.04) 60%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+    }
+    .entrance-1  { animation: slide-up 0.5s ease-out 0.02s both; }
+    .entrance-2  { animation: slide-up 0.5s ease-out 0.05s both; }
+    .entrance-3  { animation: slide-up 0.5s ease-out 0.08s both; }
+    .entrance-4  { animation: slide-up 0.5s ease-out 0.11s both; }
+    .entrance-5  { animation: slide-up 0.5s ease-out 0.14s both; }
+    .entrance-6  { animation: slide-up 0.5s ease-out 0.17s both; }
+    .entrance-7  { animation: slide-up 0.5s ease-out 0.20s both; }
+    .entrance-8  { animation: slide-up 0.5s ease-out 0.23s both; }
+    .entrance-9  { animation: slide-up 0.5s ease-out 0.26s both; }
+    .entrance-10 { animation: slide-up 0.5s ease-out 0.29s both; }
+    .entrance-11 { animation: slide-up 0.5s ease-out 0.32s both; }
+    .entrance-12 { animation: slide-up 0.5s ease-out 0.35s both; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #22d3ee, #6366f1);
+      border-radius: 3px;
+    }
+    html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+    ::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+    .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .js-hidden { visibility: hidden; }
+
+    /* ══════════════════════════════════════════════════════════════
+       ACCENT THEME — CSS custom properties per grade (RGB values)
+       ══════════════════════════════════════════════════════════════ */
+    .accent-sky     { --a3: #7dd3fc; --a6r:   2,132,199; --a7r:   3,105,161; --a5r:  14,165,233; }
+    .accent-amber   { --a3: #fcd34d; --a6r: 217,119,  6; --a7r: 180, 83,  9; --a5r: 245,158, 11; }
+    .accent-teal    { --a3: #5eead4; --a6r:  13,148,136; --a7r:  15,118,110; --a5r:  20,184,166; }
+    .accent-pink    { --a3: #f9a8d4; --a6r: 219, 39,119; --a7r: 190, 24, 93; --a5r: 236, 72,153; }
+    .accent-orange  { --a3: #fdba74; --a6r: 234, 88, 12; --a7r: 194, 65, 12; --a5r: 249,115, 22; }
+    .accent-indigo  { --a3: #a5b4fc; --a6r:  79, 70,229; --a7r:  67, 56,202; --a5r:  99,102,241; }
+    .accent-cyan    { --a3: #67e8f9; --a6r:   8,145,178; --a7r:  14,116,144; --a5r:   6,182,212; }
+    .accent-blue    { --a3: #93c5fd; --a6r:  37, 99,235; --a7r:  29, 78,216; --a5r:  59,130,246; }
+    .accent-emerald { --a3: #6ee7b7; --a6r:   5,150,105; --a7r:   4,120, 87; --a5r:  16,185,129; }
+    .accent-violet  { --a3: #c4b5fd; --a6r: 124, 58,237; --a7r: 109, 40,217; --a5r: 139, 92,246; }
+    .accent-fuchsia { --a3: #f0abfc; --a6r: 192, 38,211; --a7r: 162, 28,175; --a5r: 217, 70,239; }
+
+    .btn-download-accent:hover {
+      background: linear-gradient(135deg, rgba(var(--a6r), 0.2), rgba(var(--a7r), 0.1)) !important;
+      border-color: rgba(var(--a5r), 0.3) !important;
+      color: var(--a3) !important;
+      box-shadow: 0 10px 15px -3px rgba(var(--a5r), 0.1) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-blue-500/8 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute -bottom-40 -right-40 w-80 sm:w-[30rem] h-80 sm:h-[30rem] bg-indigo-500/8 rounded-full blur-[120px] animate-float-delayed"></div>
+  </div>
+
+  <nav class="relative z-50 nav-safe">
+    <div class="glass-strong fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] sm:w-[calc(100%-2rem)] max-w-6xl rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl shadow-cyan-500/5">
+      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
+          <i class="fa-solid fa-book-open text-white text-sm sm:text-lg"></i>
+        </div>
+        <span class="text-white font-bold text-base sm:text-xl tracking-tight">مكتبة <span class="gradient-text">مدار</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">
+          <i class="fa-solid fa-house ml-1.5"></i>الرئيسية
+        </a>
+        <span id="navGradeLabel" class="text-cyan-300 text-sm font-medium">
+          <i class="fa-solid fa-book ml-1.5"></i><span id="navGradeText"></span>
+        </span>
+      </div>
+      <a href="index.html"
+         class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
+                text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
+                hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
+                transition-all duration-300 shrink-0">
+        <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+        العودة للصفوف
+      </a>
+      <button id="mobileMenuBtn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+  </nav>
+
+  <section class="relative z-10 pt-28 pb-6 sm:pt-36 sm:pb-8 md:pt-44 md:pb-10 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="hidden xs:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 entrance-1">
+        <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+        <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs text-slate-700"></i>
+        <span id="breadcrumbGrade" class="text-cyan-400"></span>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div class="entrance-2">
+          <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span id="headerBadge"></span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            كتب <span id="headerTitle" class="gradient-text-accent"></span>
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base mt-1.5 sm:mt-2">اختر المادة الدراسية ثم حمل الكتاب بنقرة واحدة</p>
+        </div>
+        <a href="index.html"
+           class="sm:hidden inline-flex items-center justify-center gap-2 w-full xs:w-auto px-5 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-700/60 active:scale-[0.98] transition-all duration-200 entrance-3 min-h-[44px]">
+          <i class="fa-solid fa-arrow-right"></i>
+          العودة للصفوف
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative z-10 px-4 pb-4 sm:pb-6 js-hidden" id="filterSection">
+    <div class="max-w-6xl mx-auto">
+      <div class="overflow-x-auto md:overflow-visible filter-scroll -mx-4 px-4 md:mx-0 md:px-0">
+        <div class="glass rounded-xl sm:rounded-2xl p-1.5 sm:p-2 inline-flex flex-nowrap md:flex-wrap items-center gap-1.5 sm:gap-2 min-w-max md:min-w-0" id="filterContainer">
+          <!-- Filters injected by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative z-10 px-4 pb-16 sm:pb-20 md:pb-24 js-hidden" id="booksSection">
+    <div class="max-w-6xl mx-auto">
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+        <!-- Cards rendered by JS -->
+      </div>
+      <div id="emptyState" class="hidden text-center py-16 sm:py-20">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center mx-auto mb-5 sm:mb-6">
+          <i class="fa-solid fa-book-open text-slate-600 text-2xl sm:text-3xl"></i>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-300 mb-1.5 sm:mb-2">لا توجد كتب في هذا التصنيف</h3>
+        <p class="text-slate-500 text-sm">اختر تصنيفاً آخر لعرض الكتب المتاحة</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="relative z-10 border-t border-slate-800/60">
+    <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-2 text-slate-400 text-xs sm:text-sm">
+          <i class="fa-regular fa-copyright text-[10px] sm:text-sm"></i>
+          <span>جميع الحقوق محفوظة لمكتبة <span class="text-cyan-400 font-semibold">مدار</span> 2024</span>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500">
+          <a href="index.html" class="hover:text-cyan-400 transition-colors">الرئيسية</a>
+          <span class="text-slate-700">|</span>
+          <span id="footerGrade" class="text-cyan-400"></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="mobileMenu" class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl hidden">
+    <div class="flex flex-col items-center justify-center h-full gap-8 px-6">
+      <button id="closeMobileMenu" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+      <a href="index.html" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</a>
+      <span id="mobileGradeLabel" class="text-2xl sm:text-3xl text-cyan-400 font-semibold"></span>
+      <div class="flex flex-wrap justify-center gap-2.5 mt-2 px-4" id="mobileFilterList">
+        <!-- Injected by JS -->
+      </div>
+      <div class="mt-2 h-px w-32 bg-slate-800"></div>
+      <a href="https://madarcore.onrender.com"
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+        <i class="fa-solid fa-arrow-right"></i>
+        الرجوع للموقع
+      </a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const semesterColors = {
+        1: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', shadow: 'shadow-emerald-500/5' },
+        2: { bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   text: 'text-amber-300',   shadow: 'shadow-amber-500/5' }
+      };
+
+      let currentGradeData = null;
+      let allBooksData = [];
+
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const gradeNum = params.get('grade');
+
+        if (!gradeNum || isNaN(gradeNum) || gradeNum < 1 || gradeNum > 12) {
+          showError('الصف غير موجود', 'الرجاء اختيار صف من 1 إلى 12');
+          return;
+        }
+
+        showSkeletons();
+
+        try {
+          const response = await fetch('books.json');
+          if (!response.ok) throw new Error('Network response was not ok');
+          const data = await response.json();
+          
+          const grade = data.grades.find(g => g.number == gradeNum);
+          if (!grade) {
+            showError('بيانات الصف غير متوفرة', 'نعتذر، لم يتم العثور على بيانات لهذا الصف في قاعدة البيانات');
+            return;
+          }
+
+          currentGradeData = grade;
+          allBooksData = grade.books;
+          
+          setupPageMetadata(grade);
+          setupVisuals(grade);
+          renderFilters();
+          renderBooks('all');
+          setupMobileMenu();
+          
+          document.getElementById('filterSection').classList.remove('js-hidden');
+          document.getElementById('booksSection').classList.remove('js-hidden');
+        } catch (error) {
+          console.error('Fetch error:', error);
+          showError('حدث خطأ أثناء تحميل البيانات', 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى');
+        }
+      }
+
+      function setupPageMetadata(grade) {
+        const name = grade.nameArabic;
+        document.title = `كتب الصف ${name} | مكتبة مدار`;
+        document.getElementById('metaDesc').content = `كتب الصف ${name} - مكتبة مدار الرقمية`;
+        document.getElementById('navGradeText').textContent = `الصف ${name}`;
+        document.getElementById('breadcrumbGrade').textContent = `الصف ${name}`;
+        document.getElementById('headerTitle').textContent = `الصف ${name}`;
+        document.getElementById('mobileGradeLabel').textContent = `الصف ${name}`;
+        document.getElementById('footerGrade').textContent = `الصف ${name}`;
+        
+        const bookCount = grade.books.reduce((acc, b) => acc + b.semesters.length, 0);
+        document.getElementById('headerBadge').textContent = `الصف ${name} - ${bookCount} كتب متاحة`;
+      }
+
+      function setupVisuals(grade) {
+        document.body.classList.add(`accent-${grade.accentColor}`);
+      }
+
+      function showSkeletons() {
+        const grid = document.getElementById('booksGrid');
+        grid.innerHTML = '';
+        for (let i = 0; i < 8; i++) {
+          grid.innerHTML += `
+            <div class="book-card rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900/50 border border-slate-800/50 flex flex-col animate-pulse">
+              <div class="h-36 sm:h-40 md:h-44 bg-slate-800 animate-shimmer"></div>
+              <div class="p-4 sm:p-5 flex flex-col flex-1 gap-4">
+                <div class="flex justify-between">
+                  <div class="h-3 w-16 bg-slate-800 rounded"></div>
+                  <div class="h-3 w-12 bg-slate-800 rounded-full"></div>
+                </div>
+                <div class="h-5 w-3/4 bg-slate-800 rounded"></div>
+                <div class="h-3 w-1/2 bg-slate-800 rounded mb-4"></div>
+                <div class="mt-auto h-11 w-full bg-slate-800 rounded-lg"></div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function renderFilters() {
+        const container = document.getElementById('filterContainer');
+        const subjects = [];
+        const seen = new Set();
+        
+        currentGradeData.books.forEach(b => {
+          if (!seen.has(b.code)) {
+            subjects.push(b);
+            seen.add(b.code);
+          }
+        });
+
+        let html = `
+          <button class="filter-pill active px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium 
+            bg-cyan-500/15 border border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-500/5" 
+            data-filter="all" onclick="window.filterBooks('all')" type="button">
+            <i class="fa-solid fa-layer-group ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i> الكل
+          </button>
+        `;
+
+        subjects.forEach(s => {
+          html += `
+            <button class="filter-pill px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium 
+              border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/30 hover:bg-cyan-500/5" 
+              data-filter="${s.code}" onclick="window.filterBooks('${s.code}')" type="button">
+              <i class="fa-solid ${s.icon} ml-1 sm:ml-1.5 text-[10px] sm:text-xs"></i> ${s.subject}
+            </button>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function renderBooks(filter) {
+        const grid = document.getElementById('booksGrid');
+        grid.innerHTML = '';
+        let visibleCount = 0;
+        let idx = 0;
+
+        currentGradeData.books.forEach(book => {
+          if (filter !== 'all' && book.code !== filter) return;
+
+          book.semesters.forEach(sem => {
+            idx++;
+            visibleCount++;
+            const sc = semesterColors[sem.term] || semesterColors[1];
+            const entranceCls = `entrance-${Math.min(idx, 12)}`;
+
+            const card = document.createElement('div');
+            card.className = `book-card rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800/50 shadow-lg shadow-slate-900/50 hover:shadow-xl flex flex-col ${entranceCls}`;
+            card.dataset.subject = book.code;
+            card.innerHTML = `
+              <div class="book-cover h-36 sm:h-40 md:h-44 bg-gradient-to-br ${book.coverGradient} flex items-center justify-center">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                  <i class="fa-solid ${book.icon} text-white/80 text-2xl sm:text-3xl"></i>
+                </div>
+              </div>
+              <div class="p-4 sm:p-5 flex flex-col flex-1">
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                  <span class="text-slate-400 text-[10px] sm:text-xs font-medium">${book.subject}</span>
+                  <span class="px-2 sm:px-2.5 py-0.5 rounded-full ${sc.bg} border ${sc.border} ${sc.text} text-[10px] sm:text-xs font-semibold shadow-sm ${sc.shadow}">
+                    <i class="fa-solid fa-star ml-1 text-[8px] sm:text-[10px]"></i> ${sem.label}
+                  </span>
+                </div>
+                <h3 class="text-white font-bold text-sm sm:text-base mb-0.5 sm:mb-1">${book.subject}</h3>
+                <p class="text-slate-500 text-[10px] sm:text-xs mb-3 sm:mb-4">للصف ${currentGradeData.nameArabic} - ${sem.label}</p>
+                <div class="mt-auto">
+                  <a download="${sem.url}" href="${sem.url}" target="_blank" 
+                     class="btn-download btn-download-accent group flex items-center justify-center gap-2 w-full px-3 sm:px-4 py-2.5 sm:py-3 
+                            rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold min-h-[44px] 
+                            bg-gradient-to-r from-slate-700/40 to-slate-800/30 
+                            border border-slate-600/30 text-slate-300 
+                            active:scale-[0.98] transition-all duration-300">
+                    <i class="fa-solid fa-download group-hover:-translate-y-0.5 transition-transform text-[10px] sm:text-xs"></i>
+                    <span>تحميل الكتاب</span>
+                  </a>
+                </div>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        });
+
+        document.getElementById('emptyState').classList.toggle('hidden', visibleCount > 0);
+      }
+
+      window.filterBooks = function(subjectKey) {
+        const pills = document.querySelectorAll('.filter-pill');
+        pills.forEach(pill => {
+          if (pill.dataset.filter === subjectKey) {
+            pill.classList.add('active', 'bg-cyan-500/15', 'border-cyan-500/50', 'text-cyan-300', 'shadow-lg', 'shadow-cyan-500/5');
+          } else {
+            pill.classList.remove('active', 'bg-cyan-500/15', 'border-cyan-500/50', 'text-cyan-300', 'shadow-lg', 'shadow-cyan-500/5');
+          }
+        });
+        renderBooks(subjectKey);
+      };
+
+      function setupMobileMenu() {
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeBtn = document.getElementById('closeMobileMenu');
+        const filterList = document.getElementById('mobileFilterList');
+
+        menuBtn.onclick = () => {
+          mobileMenu.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+        closeBtn.onclick = () => {
+          mobileMenu.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        const subjects = [];
+        const seen = new Set();
+        currentGradeData.books.forEach(b => {
+          if (!seen.has(b.code)) {
+            subjects.push(b);
+            seen.add(b.code);
+          }
+        });
+
+        let mfHTML = `<button class="px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks('all'); document.getElementById('mobileMenu').classList.add('hidden'); document.body.style.overflow='';">الكل</button>`;
+        subjects.forEach(s => {
+          mfHTML += `<button class="px-4 py-2 rounded-full border border-slate-700 text-slate-300 text-sm hover:border-cyan-500/40 transition-colors" onclick="window.filterBooks('${s.code}'); document.getElementById('mobileMenu').classList.add('hidden'); document.body.style.overflow='';">
+            <i class="fa-solid ${s.icon} ml-1.5"></i> ${s.subject}
+          </button>`;
+        });
+        filterList.innerHTML = mfHTML;
+      }
+
+      function showError(title, message) {
+        const section = document.getElementById('booksSection');
+        section.innerHTML = `
+          <div class="max-w-6xl mx-auto flex items-center justify-center py-20">
+            <div class="glass-strong p-8 rounded-3xl text-center max-w-md border-red-500/20 shadow-2xl shadow-red-500/10">
+              <div class="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-circle-exclamation text-red-400 text-3xl"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-white mb-3">${title}</h3>
+              <p class="text-slate-400 mb-8 leading-relaxed">${message}</p>
+              <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium hover:bg-slate-700 transition-all duration-200">
+                <i class="fa-solid fa-arrow-right"></i> العودة للرئيسية
+              </a>
+            </div>
+          </div>
+        `;
+        document.getElementById('filterSection').classList.add('hidden');
+        document.getElementById('booksSection').classList.remove('js-hidden');
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
+</file>
+
+<file path="books.json">
+{
+  "grades": [
+    {
+      "number": 1,
+      "nameArabic": "الأول",
+      "nameEnglish": "Grade 1",
+      "accentColor": "sky",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #082f49 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #38bdf8, #2563eb)",
+      "badgeClass": "bg-sky-500/10 border-sky-500/20 text-sky-300",
+      "arrowCSS": "#38bdf8",
+      "books": []
+    },
+    {
+      "number": 2,
+      "nameArabic": "الثاني",
+      "nameEnglish": "Grade 2",
+      "accentColor": "amber",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #451a03 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #fbbf24, #ea580c)",
+      "badgeClass": "bg-amber-500/10 border-amber-500/20 text-amber-300",
+      "arrowCSS": "#fbbf24",
+      "books": []
+    },
+    {
+      "number": 3,
+      "nameArabic": "الثالث",
+      "nameEnglish": "Grade 3",
+      "accentColor": "teal",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #2dd4bf, #059669)",
+      "badgeClass": "bg-teal-500/10 border-teal-500/20 text-teal-300",
+      "arrowCSS": "#2dd4bf",
+      "books": []
+    },
+    {
+      "number": 4,
+      "nameArabic": "الرابع",
+      "nameEnglish": "Grade 4",
+      "accentColor": "pink",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #500724 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #f472b6, #e11d48)",
+      "badgeClass": "bg-pink-500/10 border-pink-500/20 text-pink-300",
+      "arrowCSS": "#f472b6",
+      "books": []
+    },
+    {
+      "number": 5,
+      "nameArabic": "الخامس",
+      "nameEnglish": "Grade 5",
+      "accentColor": "orange",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #431407 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #fb923c, #dc2626)",
+      "badgeClass": "bg-orange-500/10 border-orange-500/20 text-orange-300",
+      "arrowCSS": "#fb923c",
+      "books": []
+    },
+    {
+      "number": 6,
+      "nameArabic": "السادس",
+      "nameEnglish": "Grade 6",
+      "accentColor": "indigo",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #818cf8, #7c3aed)",
+      "badgeClass": "bg-indigo-500/10 border-indigo-500/20 text-indigo-300",
+      "arrowCSS": "#818cf8",
+      "books": []
+    },
+    {
+      "number": 7,
+      "nameArabic": "السابع",
+      "nameEnglish": "Grade 7",
+      "accentColor": "cyan",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #083344 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #22d3ee, #2563eb)",
+      "badgeClass": "bg-cyan-500/10 border-cyan-500/20 text-cyan-300",
+      "arrowCSS": "#22d3ee",
+      "books": []
+    },
+    {
+      "number": 8,
+      "nameArabic": "الثامن",
+      "nameEnglish": "Grade 8",
+      "accentColor": "blue",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #172554 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #60a5fa, #4f46e5)",
+      "badgeClass": "bg-blue-500/10 border-blue-500/20 text-blue-300",
+      "arrowCSS": "#60a5fa",
+      "books": []
+    },
+    {
+      "number": 9,
+      "nameArabic": "التاسع",
+      "nameEnglish": "Grade 9",
+      "accentColor": "indigo",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #818cf8, #7c3aed)",
+      "badgeClass": "bg-indigo-500/10 border-indigo-500/20 text-indigo-300",
+      "arrowCSS": "#818cf8",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "اللغة الانجليزية",
+          "code": "en",
+          "icon": "fa-language",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_en_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الكيمياء",
+          "code": "ch",
+          "icon": "fa-flask",
+          "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ch_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الفيزياء",
+          "code": "ph",
+          "icon": "fa-atom",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/9_ph_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "nameArabic": "العاشر",
+      "nameEnglish": "Grade 10",
+      "accentColor": "emerald",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #022c22 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #34d399, #0d9488)",
+      "badgeClass": "bg-emerald-500/10 border-emerald-500/20 text-emerald-300",
+      "arrowCSS": "#34d399",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "اللغة الانجليزية",
+          "code": "en",
+          "icon": "fa-language",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_en_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_en_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الكيمياء",
+          "code": "ch",
+          "icon": "fa-flask",
+          "coverGradient": "from-purple-600/40 via-purple-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ch_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ch_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الفيزياء",
+          "code": "ph",
+          "icon": "fa-atom",
+          "coverGradient": "from-cyan-600/40 via-cyan-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ph_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/10_ph_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "nameArabic": "الحادي عشر",
+      "nameEnglish": "Grade 11",
+      "accentColor": "violet",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #2e1065 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #a78bfa, #7c3aed)",
+      "badgeClass": "bg-violet-500/10 border-violet-500/20 text-violet-300",
+      "arrowCSS": "#a78bfa",
+      "books": [
+        {
+          "subject": "اللغة العربية",
+          "code": "ar",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_ar_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_ar_2.pdf" }
+          ]
+        },
+        {
+          "subject": "الرياضيات",
+          "code": "math",
+          "icon": "fa-square-root-variable",
+          "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_2.pdf" }
+          ]
+        },
+        {
+          "subject": "تاريخ الأردن",
+          "code": "hist",
+          "icon": "fa-book",
+          "coverGradient": "from-amber-600/40 via-amber-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_hist_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_hist_2.pdf" }
+          ]
+        },
+        {
+          "subject": "التربية الاسلامية",
+          "code": "islam",
+          "icon": "fa-book-quran",
+          "coverGradient": "from-emerald-600/40 via-emerald-800/30 to-slate-900",
+          "semesters": [
+            { "term": 1, "label": "الفصل الأول", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_islam_1.pdf" },
+            { "term": 2, "label": "الفصل الثاني", "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_islam_2.pdf" }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "nameArabic": "الثاني عشر",
+      "nameEnglish": "Grade 12",
+      "accentColor": "fuchsia",
+      "cardBg": "linear-gradient(135deg, #0f172a 0%, #4a044e 50%, #0f172a 100%)",
+      "iconGradient": "linear-gradient(135deg, #e879f9, #a21caf)",
+      "badgeClass": "bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-300",
+      "arrowCSS": "#e879f9",
+      "books": []
+    }
+  ]
+}
+</file>
+
+<file path="index.html">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020617">
+  <meta name="description" content="مكتبة مدار - المنصة الرقمية لتحميل الكتب المدرسية للصفوف من الأول حتى الثاني عشر">
+  <title>مكتبة مدار | المكتبة الرقمية</title>
+  <link rel="icon" type="image/webp" href="logo.webp">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       TAILWIND CONFIG
+       ══════════════════════════════════════════════════════════════ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: { 'xs': '420px' },
+          fontFamily: {
+            sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 7s ease-in-out infinite',
+            'float-delayed': 'float 7s ease-in-out 3.5s infinite',
+            'slide-up': 'slide-up 0.7s ease-out forwards',
+            'shimmer': 'shimmer 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-24px)' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(36px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       GLOBAL RESET & BASE
+       ══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #020617;
+      background-image:
+        radial-gradient(ellipse at 20% 15%, rgba(6, 182, 212, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgba(99, 102, 241, 0.05) 0%, transparent 55%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+    .glass-strong {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .grade-card {
+      position: relative;
+      isolation: isolate;
+      min-height: 220px;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+      cursor: pointer;
+    }
+    @media (min-width: 768px) { .grade-card { min-height: 260px; } }
+    .grade-card:active { transform: scale(0.97); }
+    @media (hover: hover) { .grade-card:hover { transform: translateY(-6px) scale(1.02); } }
+    .grade-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, transparent 35%, rgba(6, 182, 212, 0.25), transparent 65%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+    @media (hover: hover) { .grade-card:hover::before { opacity: 1; } }
+    .gradient-text {
+      background: linear-gradient(135deg, #22d3ee 0%, #818cf8 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .entrance-1  { animation: slide-up 0.6s ease-out 0.05s both; }
+    .entrance-2  { animation: slide-up 0.6s ease-out 0.12s both; }
+    .entrance-3  { animation: slide-up 0.6s ease-out 0.20s both; }
+    .entrance-4  { animation: slide-up 0.6s ease-out 0.28s both; }
+    .entrance-5  { animation: slide-up 0.6s ease-out 0.36s both; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #22d3ee, #6366f1);
+      border-radius: 3px;
+    }
+    html { scrollbar-width: thin; scrollbar-color: #22d3ee #020617; }
+    ::selection { background: rgba(6, 182, 212, 0.35); color: #fff; }
+    .nav-safe { padding-top: env(safe-area-inset-top, 0px); }
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+<body x-data="app()" x-init="init()">
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -right-40 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/8 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 sm:w-[30rem] h-80 sm:h-[30rem] bg-indigo-500/8 rounded-full blur-[120px] animate-float-delayed"></div>
+    <div class="absolute top-1/3 left-1/4 w-48 sm:w-64 h-48 sm:h-64 bg-blue-500/5 rounded-full blur-[80px] animate-float" style="animation-delay: 1.8s;"></div>
+  </div>
+
+  <nav class="relative z-50 nav-safe">
+    <div class="glass-strong fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] sm:w-[calc(100%-2rem)] max-w-6xl rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl shadow-cyan-500/5">
+      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/15 group-hover:shadow-cyan-500/35 transition-shadow duration-300">
+          <i class="fa-solid fa-book-open text-white text-sm sm:text-lg"></i>
+        </div>
+        <span class="text-white font-bold text-base sm:text-xl tracking-tight">مكتبة <span class="gradient-text">مدار</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">الرئيسية</a>
+        <a href="#grades" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">الصفوف</a>
+        <a href="#features" class="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200">المميزات</a>
+      </div>
+      <a href="https://madarcore.onrender.com"
+         class="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium
+                text-cyan-300 border border-cyan-500/20 bg-cyan-500/5
+                hover:bg-cyan-500/15 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10
+                transition-all duration-300 shrink-0">
+        <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+        <span class="hidden xs:inline">الرجوع للموقع</span>
+      </a>
+      <button @click="mobileMenuOpen = true" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="فتح القائمة">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="relative z-10">
+    <!-- ─── HERO ─── -->
+    <section class="pt-28 pb-12 sm:pt-36 sm:pb-16 md:pt-44 md:pb-20 px-4">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs sm:text-sm font-medium mb-4 sm:mb-6 entrance-1">
+          <i class="fa-solid fa-graduation-cap text-xs sm:text-sm"></i>
+          <span>المكتبة الرقمية للكتب المدرسية</span>
+        </div>
+        <h1 class="text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 entrance-2">
+          <span class="gradient-text">مكتبة مدار</span>
+          <br>
+          <span class="text-white/90">الرقمية</span>
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed px-2 entrance-3">
+          حمل جميع كتبك المدرسية من
+          <span class="text-cyan-300 font-semibold">الصف الأول</span>
+          إلى
+          <span class="text-violet-300 font-semibold">الصف الثاني عشر</span>
+          بضغطة زر واحدة. سهل، سريع، ومتاح دائماً.
+        </p>
+        <div class="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-10 entrance-4">
+          <a href="#grades"
+             class="group relative inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base
+                    bg-gradient-to-r from-cyan-500 to-blue-600 text-white
+                    shadow-lg shadow-cyan-500/20
+                    hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.98]
+                    transition-all duration-300 overflow-hidden min-h-[48px]">
+            <span class="relative z-10">تصفح الكتب</span>
+            <i class="fa-solid fa-arrow-down relative z-10 group-hover:translate-y-0.5 transition-transform text-xs sm:text-sm"></i>
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </a>
+          <a href="#features"
+             class="group inline-flex items-center justify-center gap-2 w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base min-h-[48px]
+                    border border-slate-700 text-slate-300
+                    hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-cyan-500/5 active:scale-[0.98]
+                    transition-all duration-300">
+            <i class="fa-solid fa-circle-info group-hover:rotate-12 transition-transform text-xs sm:text-sm"></i>
+            <span>المميزات</span>
+          </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-16 mt-12 sm:mt-16 entrance-5">
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text" x-text="toArNum(12)"></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">صف دراسي</div>
+          </div>
+          <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text">+<span x-text="toArNum(120)"></span></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">كتاب مدرسي</div>
+          </div>
+          <div class="w-px h-8 sm:h-10 bg-slate-800 hidden xs:block"></div>
+          <div class="text-center">
+            <div class="text-2xl sm:text-3xl font-bold gradient-text" x-text="toArNum(5)"></div>
+            <div class="text-slate-500 text-[11px] sm:text-sm mt-0.5 sm:mt-1">مواد دراسية</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── GRADES GRID ─── -->
+    <section id="grades" class="px-4 pb-16 sm:pb-20 md:pb-24">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-8 sm:mb-10 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">اختر صفك الدراسي</h2>
+          <p class="text-slate-400 text-sm sm:text-base">اضغط على الصف الذي تريد لاستعراض كتبه وتحميلها</p>
+        </div>
+
+        <!-- Loading Skeletons -->
+        <div x-show="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+          <template x-for="i in 8">
+            <div class="grade-card rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between border border-slate-800 bg-slate-900/50 animate-pulse h-[220px] sm:h-[260px]">
+              <div class="flex justify-between">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800"></div>
+                <div class="px-2.5 sm:px-3 py-1 rounded-full bg-slate-800 w-12 h-5"></div>
+              </div>
+              <div class="mt-auto">
+                <div class="h-6 w-3/4 bg-slate-800 rounded mb-2"></div>
+                <div class="h-4 w-1/2 bg-slate-800 rounded"></div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Real Grid -->
+        <div x-show="!isLoading" x-cloak class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+          <template x-for="(grade, i) in grades" :key="grade.number">
+            <button @click="selectGrade(grade)"
+                    :style="{ background: grade.cardBg, borderColor: 'rgba(30, 41, 59, 0.6)' }"
+                    class="grade-card group relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-6 flex flex-col justify-between border shadow-lg text-right w-full"
+                    :class="[`shadow-${grade.accentColor}-950/30`, `entrance-${Math.min(i + 1, 5)}`]">
+              <div class="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div class="flex items-start justify-between w-full relative z-10">
+                <div :style="{ background: grade.iconGradient }"
+                     class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg"
+                     :class="`shadow-${grade.accentColor}-500/15 group-hover:shadow-${grade.accentColor}-500/35`">
+                  <span class="text-white text-xl sm:text-2xl font-bold" x-text="toArNum(grade.number)"></span>
+                </div>
+                <span :class="`px-2.5 sm:px-3 py-1 rounded-full ${grade.badgeClass} text-[10px] sm:text-xs font-medium`">
+                  <span x-text="`${toArNum(grade.bookCount)} كتب`"></span>
+                </span>
+              </div>
+              <div class="mt-auto pt-6 relative z-10 w-full text-right">
+                <h3 class="text-xl sm:text-2xl font-bold text-white mb-0.5" x-text="`الصف ${grade.nameArabic}`"></h3>
+                <p class="text-slate-400 text-xs sm:text-sm" x-text="grade.nameEnglish"></p>
+              </div>
+              <div :style="{ color: grade.arrowCSS }"
+                   class="absolute bottom-5 sm:bottom-6 left-5 sm:left-6 w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300">
+                <i class="fa-solid fa-arrow-left text-xs sm:text-sm" :style="{ color: grade.arrowCSS }"></i>
+              </div>
+            </button>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── FEATURES ─── -->
+    <section id="features" class="px-4 pb-16 sm:pb-20 md:pb-24">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-8 sm:mb-10 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">لماذا مكتبة مدار؟</h2>
+          <p class="text-slate-400 text-sm sm:text-base">مميزات تجعل تجربة التحميل سهلة وممتعة</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-cyan-500/20 transition-all duration-300">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-bolt text-cyan-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">تحميل سريع</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">جميع الكتب متاحة بصيغة PDF للتحميل المباشر بدون انتظار</p>
+          </div>
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-indigo-500/20 transition-all duration-300">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-mobile-screen text-indigo-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">متجاوب بالكامل</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">تصفح مريح على جميع الأجهزة - موبايل، تابلت، أو كمبيوتر</p>
+          </div>
+          <div class="glass rounded-2xl p-5 sm:p-6 text-center hover:border-violet-500/20 transition-all duration-300 sm:col-span-2 md:col-span-1">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-violet-500/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <i class="fa-solid fa-leaf text-violet-400 text-lg sm:text-xl"></i>
+            </div>
+            <h3 class="text-white font-bold text-sm sm:text-base mb-1.5 sm:mb-2">مصمم ببساطة</h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">واجهة نظيفة ومرتبة تركز على ما يهمك - الكتب الدراسية</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="relative z-10 border-t border-slate-800/60">
+    <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-2 text-slate-400 text-xs sm:text-sm">
+          <i class="fa-regular fa-copyright text-[10px] sm:text-sm"></i>
+          <span>جميع الحقوق محفوظة لمكتبة <span class="text-cyan-400 font-semibold">مدار</span> 2026</span>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500">
+          <span class="text-slate-500 text-[10px] sm:text-xs">
+            صنع بـ <i class="fa-solid fa-heart text-cyan-400 text-[10px] sm:text-xs"></i> لخدمة الطلاب
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div x-show="mobileMenuOpen" x-cloak
+       class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-xl"
+       @click.self="mobileMenuOpen = false">
+    <div class="flex flex-col items-center justify-center h-full gap-8 px-6">
+      <button @click="mobileMenuOpen = false" class="absolute top-5 left-5 w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+      <div class="flex flex-col items-center gap-8">
+        <button @click="mobileMenuOpen = false" class="text-2xl sm:text-3xl text-white font-bold hover:text-cyan-400 transition-colors">الرئيسية</button>
+        <a href="#grades" @click="mobileMenuOpen = false" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors">الصفوف</a>
+        <a href="#features" @click="mobileMenuOpen = false" class="text-2xl sm:text-3xl text-slate-300 hover:text-cyan-400 transition-colors">المميزات</a>
+        <div class="mt-2 h-px w-32 bg-slate-800"></div>
+        <a href="https://madarcore.onrender.com"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium text-sm hover:bg-cyan-500/20 transition-colors">
+          <i class="fa-solid fa-arrow-right"></i>
+          الرجوع للموقع
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hidden" aria-hidden="true">
+    <span class="bg-sky-500/10 border-sky-500/20 text-sky-300"></span>
+    <span class="bg-amber-500/10 border-amber-500/20 text-amber-300"></span>
+    <span class="bg-teal-500/10 border-teal-500/20 text-teal-300"></span>
+    <span class="bg-pink-500/10 border-pink-500/20 text-pink-300"></span>
+    <span class="bg-orange-500/10 border-orange-500/20 text-orange-300"></span>
+    <span class="bg-indigo-500/10 border-indigo-500/20 text-indigo-300"></span>
+    <span class="bg-cyan-500/10 border-cyan-500/20 text-cyan-300"></span>
+    <span class="bg-blue-500/10 border-blue-500/20 text-blue-300"></span>
+    <span class="bg-emerald-500/10 border-emerald-500/20 text-emerald-300"></span>
+    <span class="bg-violet-500/10 border-violet-500/20 text-violet-300"></span>
+    <span class="bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-300"></span>
+    <span class="shadow-sky-950/30 shadow-amber-950/30 shadow-teal-950/30 shadow-pink-950/30 shadow-orange-950/30 shadow-indigo-950/30 shadow-cyan-950/30 shadow-blue-950/30 shadow-emerald-950/30 shadow-violet-950/30 shadow-fuchsia-950/30"></span>
+    <span class="shadow-sky-500/15 shadow-amber-500/15 shadow-teal-500/15 shadow-pink-500/15 shadow-orange-500/15 shadow-indigo-500/15 shadow-cyan-500/15 shadow-blue-500/15 shadow-emerald-500/15 shadow-violet-500/15 shadow-fuchsia-500/15"></span>
+    <span class="group-hover:shadow-sky-500/35 group-hover:shadow-amber-500/35 group-hover:shadow-teal-500/35 group-hover:shadow-pink-500/35 group-hover:shadow-orange-500/35 group-hover:shadow-indigo-500/35 group-hover:shadow-cyan-500/35 group-hover:shadow-blue-500/35 group-hover:shadow-emerald-500/35 group-hover:shadow-violet-500/35 group-hover:shadow-fuchsia-500/35"></span>
+  </div>
+
+  <script>
+    // Helper for Arabic numerals
+    function toArabicNumeral(n) {
+      var digits = '٠١٢٣٤٥٦٧٨٩';
+      return String(n).split('').map(function(c) {
+        return digits[parseInt(c, 10)] || c;
+      }).join('');
+    }
+
+    function app() {
+      return {
+        grades: [],
+        isLoading: true,
+        mobileMenuOpen: false,
+
+        async init() {
+          console.log('Dashboard: Initializing...');
+          try {
+            // Add cache-buster to ensure fresh data
+            const response = await fetch('books.json?t=' + Date.now());
+            if (!response.ok) {
+              throw new Error('HTTP error! status: ' + response.status);
+            }
+            const data = await response.json();
+            console.log('Dashboard: Data loaded:', data);
+
+            if (data && Array.isArray(data.grades)) {
+              this.grades = data.grades.map(g => ({
+                ...g,
+                // Calculate book count safely
+                bookCount: g.books ? g.books.reduce((acc, b) => acc + b.semesters.length, 0) : 0
+              }));
+              console.log('Dashboard: Grades processed:', this.grades.length);
+            } else {
+              console.error('Dashboard: Invalid data structure. Expected "grades" array.');
+              this.grades = [];
+            }
+          } catch (e) {
+            console.error('Dashboard: Failed to load books.json:', e);
+            this.grades = []; // Ensure empty array on failure
+          } finally {
+            this.isLoading = false;
+            console.log('Dashboard: Loading state set to false.');
+          }
+        },
+
+        selectGrade(grade) {
+          console.log('Dashboard: Navigating to grade', grade.number);
+          window.location.href = `book.html?grade=${grade.number}`;
+        },
+
+        toArNum(n) {
+          return toArabicNumeral(n);
+        }
+      };
+    }
+  </script>
+</body>
+</html>
+</file>
+
+</files>

@@ -1,0 +1,171 @@
+---
+interface GradeBook {
+  number: number;
+  nameArabic: string;
+  nameEnglish: string;
+  books: Array<{
+    subject: string;
+    code: string;
+    icon: string;
+    coverGradient: string;
+    semesters: Array<{ label: string }>;
+  }>;
+}
+
+interface Props {
+  grades: GradeBook[];
+}
+
+const { grades } = Astro.props;
+
+// Build the search data for the client
+const clientGrades = grades.map(g => ({
+  number: g.number,
+  nameArabic: g.nameArabic,
+  nameEnglish: g.nameEnglish,
+  books: (g.books || []).map(b => ({
+    subject: b.subject,
+    code: b.code,
+    icon: b.icon,
+    coverGradient: b.coverGradient,
+    semesters: (b.semesters || []).map(s => ({ label: s.label })),
+  })),
+}));
+---
+
+<div class="relative max-w-2xl mx-auto" id="searchWidget">
+  <div class="relative rounded-2xl flex items-center px-5 py-3.5 border transition-all duration-200 focus-within:shadow-sm"
+       style="background-color: var(--surface); border-color: var(--border);">
+    <i class="fa-solid fa-search ml-3 text-sm" style="color: var(--text-subtle);"></i>
+    <input
+      id="globalSearch"
+      type="text"
+      placeholder="ابحث عن كتاب (اسم المادة، رقم الصف...)"
+      class="w-full bg-transparent outline-none text-sm sm:text-base font-medium"
+      style="color: var(--text); placeholder-color: var(--text-subtle);"
+      autocomplete="off"
+    />
+    <kbd class="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-lg border font-bold"
+         style="color: var(--text-subtle); background-color: var(--surface-hover); border-color: var(--border);">⌘K</kbd>
+  </div>
+  <div
+    id="searchResults"
+    class="absolute top-full mt-2 w-full rounded-2xl overflow-hidden max-h-96 overflow-y-auto hidden border shadow-xl"
+    style="background-color: var(--surface); border-color: var(--border);"
+  ></div>
+</div>
+
+<script define:vars={{ clientGrades }}>
+  const index = clientGrades.flatMap(grade =>
+    (grade.books || []).map(book => ({
+      id: `${grade.number}-${book.code}`,
+      gradeNumber: grade.number,
+      gradeNameAr: grade.nameArabic,
+      gradeNameEn: grade.nameEnglish,
+      subjectAr: book.subject,
+      subjectCode: book.code,
+      url: `/grade/${grade.number}/${book.code}`,
+      icon: book.icon || 'fa-book',
+      coverGradient: book.coverGradient || 'from-slate-700 to-slate-900',
+      semesterLabels: (book.semesters || []).map(s => s.label),
+    }))
+  );
+
+  const input = document.getElementById('globalSearch');
+  const resultsContainer = document.getElementById('searchResults');
+
+  if (!input || !resultsContainer) throw new Error('Search DOM elements not found');
+
+  function search(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return index.filter(item =>
+      item.subjectAr.includes(q) ||
+      item.subjectCode.includes(q) ||
+      item.gradeNameAr.includes(q) ||
+      item.gradeNameEn.toLowerCase().includes(q) ||
+      String(item.gradeNumber).includes(q)
+    );
+  }
+
+  function renderResults(items) {
+    if (items.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="p-8 text-center">
+          <i class="fa-solid fa-book-open" style="color: var(--text-subtle); font-size: 2.5rem; margin-bottom: 0.75rem;"></i>
+          <p class="text-sm font-medium" style="color: var(--text-muted);">لا توجد نتائج لبحثك</p>
+          <p class="text-xs mt-1 font-medium" style="color: var(--text-subtle);">حاول بكلمات مختلفة</p>
+        </div>
+      `;
+      return;
+    }
+
+    resultsContainer.innerHTML = items.map(item => `
+      <a href="${item.url}"
+         class="flex items-center gap-3.5 px-5 py-3.5 transition-colors border-b last:border-0"
+         style="border-color: var(--border);"
+         onmouseover="this.style.backgroundColor='var(--surface-hover)'"
+         onmouseout="this.style.backgroundColor='transparent'">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${item.coverGradient} flex items-center justify-center shrink-0">
+          <i class="fa-solid ${item.icon} text-white text-sm"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold truncate" style="color: var(--text);">${item.subjectAr}</div>
+          <div class="text-xs font-medium" style="color: var(--text-muted);">${item.gradeNameAr} • ${item.semesterLabels.join('، ')}</div>
+        </div>
+        <i class="fa-solid fa-arrow-left text-xs shrink-0" style="color: var(--text-subtle);"></i>
+      </a>
+    `).join('');
+  }
+
+  let debounceTimer;
+  let selectedIndex = -1;
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const results = search(input.value);
+      renderResults(results);
+      resultsContainer.classList.remove('hidden');
+      selectedIndex = -1;
+    }, 300);
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) {
+      const results = search(input.value);
+      renderResults(results);
+      resultsContainer.classList.remove('hidden');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const widget = document.getElementById('searchWidget');
+    if (widget && !widget.contains(e.target)) {
+      resultsContainer.classList.add('hidden');
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const links = resultsContainer.querySelectorAll('a');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, links.length - 1);
+      if (links[selectedIndex]) links[selectedIndex].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      if (links[selectedIndex]) links[selectedIndex].focus();
+    } else if (e.key === 'Escape') {
+      resultsContainer.classList.add('hidden');
+      input.blur();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+</script>
