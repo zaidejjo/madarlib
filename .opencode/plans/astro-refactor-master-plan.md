@@ -174,12 +174,12 @@ All Astro-related files live inside `/astro/`. The root workspace contains only 
 
 **File: `astro/scripts/copy-books-json.js`**
 
-A Node.js script that copies `/books.json` → `/astro/src/data/books.json`. Idempotent — creates the target directory if it doesn't exist.
+A Bun-compatible script that copies `/books.json` → `/astro/src/data/books.json`. Idempotent — creates the target directory if it doesn't exist.
 
 ```js
-import { copyFileSync, mkdirSync, existsSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { copyFileSync, mkdirSync, existsSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..', '..');       // workspace root
@@ -193,13 +193,27 @@ copyFileSync(resolve(root, 'books.json'), dest);
 console.log('✓ books.json copied to src/data/');
 ```
 
-### 2.3 — package.json Scripts
+### 2.3 — Bun Package Manager
+
+**Use `bun` exclusively** — not `npm`, not `pnpm`, not `yarn`.
+
+```bash
+# Install all commands use bun
+bun install
+
+# Run scripts
+bun run dev
+bun run build
+bun run prebuild    # copies books.json
+```
+
+**package.json Scripts:**
 
 ```jsonc
 {
   "scripts": {
-    "prebuild": "node scripts/copy-books-json.js",
-    "predev": "node scripts/copy-books-json.js",
+    "prebuild": "bun run scripts/copy-books-json.js",
+    "predev": "bun run scripts/copy-books-json.js",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
@@ -208,22 +222,71 @@ console.log('✓ books.json copied to src/data/');
 ```
 
 - `prebuild` / `predev` hooks ensure `books.json` is always fresh before any Astro operation.
-- Compatible with Windows, Linux, and macOS (pure Node.js `fs` — no shell commands).
+- Compatible with Windows, Linux, and macOS (pure `node:fs` — no shell commands).
+- `bun run build` triggers `prebuild` → `astro build` sequentially.
 
-### 2.4 — Init Commands
+### 2.4 — Bun Init (Package Manager)
 
 In the `/astro` directory:
 ```bash
-npm create astro@latest . -- --template minimal --no-install --yes
-npm install astro tailwindcss @astrojs/tailwind @astrojs/sitemap
-npx tailwindcss init -p
+bun create astro@latest . -- --template minimal --yes --no-install
+bun add astro @astrojs/sitemap tailwindcss@3 postcss autoprefixer
 ```
 
-### 2.5 — `astro.config.mjs` (with sitemap & production URL)
+Tailwind v3 is used deliberately (not v4) for compatibility with `@tailwind` directives and `tailwind.config.mjs`.
+
+### 2.5 — Tailwind v3 via PostCSS (not @astrojs/tailwind)
+
+`@astrojs/tailwind` is deprecated for Astro v7. Instead, use Tailwind v3 via PostCSS, which Vite auto-detects via `postcss.config.cjs`:
+
+**`astro/postcss.config.cjs`:**
+```js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+```
+
+**`astro/tailwind.config.mjs`:**
+```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./src/**/*.{astro,html,js,jsx,ts,tsx}'],
+  safelist: [
+    'text-sky-300', 'bg-sky-500/10', 'border-sky-500/20',
+    'text-amber-300', 'bg-amber-500/10', 'border-amber-500/20',
+    // ... all 11 accent colors + cover gradient fragments
+  ],
+  theme: {
+    extend: {
+      screens: { xs: '420px' },
+      fontFamily: { sans: ['"Tajawal"', '"Segoe UI"', 'system-ui', 'sans-serif'] },
+      animation: {
+        float: 'float 7s ease-in-out infinite',
+        'float-delayed': 'float 7s ease-in-out 3.5s infinite',
+        'slide-up': 'slide-up 0.7s ease-out forwards',
+        shimmer: 'shimmer 3s linear infinite',
+      },
+      keyframes: { /* ... */ },
+    },
+  },
+};
+```
+
+**`astro/src/styles/global.css` — Tailwind directives:**
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Custom styles follow */
+```
+
+### 2.6 — `astro.config.mjs` (with sitemap & production URL)
 
 ```js
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
@@ -530,37 +593,45 @@ const searchIndex = [
 ];
 ```
 
-### 5.3 — SearchBar Component
+### 5.3 — SearchBar Component (Uses `define:vars`)
 
 **Location:** `SearchBar.astro` — renders HTML shell + client-side `<script>`.
 
+**CRITICAL — Data Passing via `define:vars`:**
+
+Do NOT embed JSON in a `<script type="application/json">` tag and call `JSON.parse()`. This causes `Uncaught SyntaxError: Expected property name or '}' in JSON at position 1` due to encoding/escaping mismatches with Arabic characters.
+
+Instead, use Astro's `define:vars` directive which safely serializes frontmatter data into the client script scope:
+
+```astro
+---
+const { grades } = Astro.props;
+const clientGrades = grades.map(g => ({ /* ... */ }));
+---
+<script define:vars={{ clientGrades }}>
+  // clientGrades is a plain JS object — no JSON.parse needed!
+  const index = clientGrades.flatMap(grade => /* ... */);
+</script>
+```
+
 **HTML structure:**
 ```html
-<div class="relative max-w-2xl mx-auto">
+<div class="relative max-w-2xl mx-auto" id="searchWidget">
   <div class="relative glass rounded-2xl flex items-center px-4 py-3">
     <i class="fa-solid fa-search text-slate-500 ml-3"></i>
-    <input
-      id="globalSearch"
-      type="text"
-      placeholder="ابحث عن كتاب (اسم المادة، رقم الصف...)"
-      class="w-full bg-transparent text-white placeholder-slate-500 outline-none"
-      autocomplete="off"
-    />
-    <kbd class="hidden sm:inline-flex text-xs text-slate-600 bg-slate-800 px-2 py-0.5 rounded">⌘K</kbd>
+    <input id="globalSearch" type="text" placeholder="ابحث عن كتاب..." autocomplete="off" />
+    <kbd class="hidden sm:inline-flex ...">⌘K</kbd>
   </div>
-  <div id="searchResults" class="absolute top-full mt-2 w-full glass-strong rounded-2xl overflow-hidden max-h-96 overflow-y-auto hidden">
-    <!-- Results injected by JS -->
-  </div>
+  <div id="searchResults" class="hidden ..."></div>
 </div>
 ```
 
 ### 5.4 — Search Logic
 
 ```js
-const allGrades = window.__GRADES_DATA__;
-
-const index = allGrades.flatMap(grade =>
-  grade.books.map(book => ({
+// clientGrades is injected by define:vars
+const index = clientGrades.flatMap(grade =>
+  (grade.books || []).map(book => ({
     id: `${grade.number}-${book.code}`,
     gradeNumber: grade.number,
     gradeNameAr: grade.nameArabic,
@@ -568,9 +639,9 @@ const index = allGrades.flatMap(grade =>
     subjectAr: book.subject,
     subjectCode: book.code,
     url: `/grade/${grade.number}/${book.code}`,
-    icon: book.icon,
-    coverGradient: book.coverGradient,
-    semesterLabels: book.semesters.map(s => s.label),
+    icon: book.icon || 'fa-book',
+    coverGradient: book.coverGradient || 'from-slate-700 to-slate-900',
+    semesterLabels: (book.semesters || []).map(s => s.label),
   }))
 );
 
@@ -581,7 +652,6 @@ function search(query) {
     item.subjectAr.includes(q) ||
     item.subjectCode.includes(q) ||
     item.gradeNameAr.includes(q) ||
-    item.gradeNameEn.toLowerCase().includes(q) ||
     String(item.gradeNumber).includes(q)
   );
 }
@@ -805,7 +875,7 @@ See Phase 2.6 above — all accent colors and cover gradients are safelisted.
 
 | Step | Action | Risk | Commit Message |
 |------|--------|------|----------------|
-| 1 | **Initialize `/astro` project** — `npm create astro`, install deps (tailwind, sitemap), configure `astro.config.mjs` and `tailwind.config.mjs` | Low | `feat: scaffold astro project with tailwind and sitemap` |
+| 1 | **Initialize `/astro` project** — `bun create astro`, `bun add astro @astrojs/sitemap tailwindcss@3 postcss autoprefixer`, configure configs | Low | `feat: scaffold astro project with tailwind and sitemap` |
 | 2 | **Create copy script + package.json scripts** for cross-platform `books.json` copy | Low | `feat: add prebuild script for books.json copy` |
 | 3 | **Create `BaseLayout.astro`** with SEO props, OpenGraph, global styles, navbar, footer, orbs | Medium | `feat: implement base layout with seo and global styles` |
 | 4 | **Create `index.astro`** — hero + grade grid | Medium | `feat: create homepage with grade grid` |

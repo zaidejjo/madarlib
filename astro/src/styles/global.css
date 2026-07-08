@@ -1,35 +1,9 @@
 /* ══════════════════════════════════════════════════════════════
-   Tailwind CSS v4 — Global Styles
+   Tailwind CSS v3 — Directives
    ══════════════════════════════════════════════════════════════ */
-@import "tailwindcss";
-
-/* ── Theme Extensions ── */
-@theme {
-  --font-sans: 'Tajawal', 'Segoe UI', system-ui, sans-serif;
-
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-float-delayed: float 7s ease-in-out 3.5s infinite;
-  --animate-slide-up: slide-up 0.7s ease-out forwards;
-  --animate-shimmer: shimmer 3s linear infinite;
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-24px); }
-  }
-
-  @keyframes slide-up {
-    0% { opacity: 0; transform: translateY(36px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-}
-
-/* ── Screens ── */
-@custom-media --xs (min-width: 420px);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════
    GLOBAL RESET & BASE

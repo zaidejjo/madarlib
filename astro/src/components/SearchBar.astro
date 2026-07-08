@@ -18,8 +18,8 @@ interface Props {
 
 const { grades } = Astro.props;
 
-// Build the search data JSON for client-side usage
-const searchData = grades.map(g => ({
+// Build the search data for the client — maps to a plain JS array
+const clientGrades = grades.map(g => ({
   number: g.number,
   nameArabic: g.nameArabic,
   nameEnglish: g.nameEnglish,
@@ -34,9 +34,6 @@ const searchData = grades.map(g => ({
 ---
 
 <div class="relative max-w-2xl mx-auto" id="searchWidget">
-  <!-- Embed data as JSON for client-side JS -->
-  <script id="searchData" type="application/json">{JSON.stringify(searchData)}</script>
-
   <div class="relative glass rounded-2xl flex items-center px-4 py-3 border border-slate-700/50">
     <i class="fa-solid fa-search text-slate-500 ml-3"></i>
     <input
@@ -54,12 +51,11 @@ const searchData = grades.map(g => ({
   ></div>
 </div>
 
-<script>
-  // ── Build search index from embedded JSON ──
-  const searchDataEl = document.getElementById('searchData');
-  const grades = searchDataEl ? JSON.parse(searchDataEl.textContent || '[]') : [];
+<script define:vars={{ clientGrades }}>
+  // clientGrades is injected safely by Astro's define:vars — NO JSON.parse needed
+  // It is a plain JavaScript object, directly usable.
 
-  const index = grades.flatMap(grade =>
+  const index = clientGrades.flatMap(grade =>
     (grade.books || []).map(book => ({
       id: `${grade.number}-${book.code}`,
       gradeNumber: grade.number,
