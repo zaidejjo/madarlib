@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>https://madarlib.pages.dev/</loc>
+    <lastmod>2026-07-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Grade Pages -->
+  <url><loc>https://madarlib.pages.dev/grade/1</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/2</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/3</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/4</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/5</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/6</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/7</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/8</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/9</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/10</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/11</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/12</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Grade 9 Subjects -->
+  <url><loc>https://madarlib.pages.dev/grade/9/ar/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/9/math/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/9/en/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/9/ch/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/9/ph/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Grade 10 Subjects -->
+  <url><loc>https://madarlib.pages.dev/grade/10/ar/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/10/math/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/10/en/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/10/ch/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/10/ph/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Grade 11 Subjects -->
+  <url><loc>https://madarlib.pages.dev/grade/11/ar/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/11/math/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/11/hist/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://madarlib.pages.dev/grade/11/islam/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
