@@ -238,7 +238,7 @@
           "icon": "fa-square-root-variable",
           "coverGradient": "from-blue-600/40 via-blue-800/30 to-slate-900",
           "semesters": [
-            { "term": 1, "label": "الفصل الأول", "studentBook": { "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_1.pdf" }, "activityBook": null },
+            { "term": 1, "label": "الفصل الأول", "studentBook": { "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_1.pdf" }, "activityBook": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_1_a.pdf" },
             { "term": 2, "label": "الفصل الثاني", "studentBook": { "url": "https://github.com/zaidejjo/madarlib/releases/download/v1.0.0/11_math_2.pdf" }, "activityBook": null }
           ]
         },
@@ -277,3 +277,4 @@
     }
   ]
 }
+
